@@ -35,6 +35,14 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "csv-skip-header": 1,
                 "stmt-template": "INSERT VERTEX organization(name,type,url) VALUES $1$:(\"$3$\",\"$2$\",\"$4$\")"
             }, {
+                "file": "${base_dir}/static/tag.csv",
+                "type": "template",
+                "batch-count": 40,
+                "repeatable": false,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT VERTEX hashtag(name,url) VALUES $1$:(\"$2$\",\"$3$\")"
+            }, {
                 "file": "${base_dir}/dynamic/post.csv",
                 "type": "template",
                 "repeatable": false,
@@ -89,6 +97,70 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "csv-separator": "|",
                 "csv-skip-header": 1,
                 "stmt-template": "INSERT EDGE study_at(year) VALUES $LOOP$ $2$ -> $3$:(\"$4$\")$END$"
+            },{
+                "file": "${base_dir}/dynamic/person_isLocatedIn_place.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE person_is_located_in() VALUES $LOOP$ $2$ -> $3$:()$END$"
+            },{
+                "file": "${base_dir}/dynamic/comment_isLocatedIn_place.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE comment_is_located_in() VALUES $LOOP$ $2$ -> $3$:()$END$"
+            },{
+                "file": "${base_dir}/static/organisation_isLocatedIn_place.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE org_is_located_in() VALUES $LOOP$ $1$ -> $2$:()$END$"
+            },{
+                "file": "${base_dir}/dynamic/post_isLocatedIn_place.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE post_is_located_in() VALUES $LOOP$ $2$ -> $3$:()$END$"
+            },{
+                "file": "${base_dir}/static/place_isPartOf_place.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE is_part_of() VALUES $LOOP$ $1$ -> $2$:()$END$"
+            },{
+                "file": "${base_dir}/dynamic/comment_hasTag_tag.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE comment_has_tag() VALUES $LOOP$ $2$ -> $3$:()$END$"
+            },{
+                "file": "${base_dir}/dynamic/post_hasTag_tag.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE post_has_tag() VALUES $LOOP$ $2$ -> $3$:()$END$"
+            },{
+                "file": "${base_dir}/dynamic/person_hasInterest_tag.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE person_has_tag() VALUES $LOOP$ $2$ -> $3$:()$END$"
             }, {
                 "file": "${base_dir}/dynamic/person_workAt_organisation.csv",
                 "type": "template",
