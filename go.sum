@@ -1,0 +1,8 @@
+github.com/facebook/fbthrift v0.0.0-20190922225929-2f9839604e25 h1:dezRDs9oGYxeavyvcNg/Js+dK6kIvfzERoJ7K8Xkv14=
+github.com/facebook/fbthrift v0.0.0-20190922225929-2f9839604e25/go.mod h1:2tncLx5rmw69e5kMBv/yJneERbzrr1yr5fdlnTbu8lU=
+github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
+github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
+github.com/vesoft-inc/nebula-go v0.0.0-20200408095338-5b0c2f518e99 h1:i8lh/GsGye3gYsOHFnThuZFJrl/kBBDGEsVaAbl1ZbE=
+github.com/vesoft-inc/nebula-go v0.0.0-20200408095338-5b0c2f518e99/go.mod h1:sZwaFK3Cz1F1Pas/ZjLzVDEFcTNXYENKur89XYP0nbA=
+golang.org/x/time v0.0.0-20191024005414-555d28b269f0 h1:/5xXl8Y5W96D+TtHSlonuFqGHIWVuyCkGJLwGh9JJFs=
+golang.org/x/time v0.0.0-20191024005414-555d28b269f0/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
