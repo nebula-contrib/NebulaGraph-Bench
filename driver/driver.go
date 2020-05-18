@@ -130,9 +130,11 @@ func (this *Driver) Start() {
     go func() {
         this.wg.Wait()
         this.sstats.Done()
-        this.sstats.WriteToDB(this.db, this.test_id)
         this.cstats.Done()
-        this.cstats.WriteToDB(this.db, this.test_id)
+        if this.db != nil {
+            this.sstats.WriteToDB(this.db, this.test_id)
+            this.cstats.WriteToDB(this.db, this.test_id)
+        }
         this.done <- 0
     }()
 }
