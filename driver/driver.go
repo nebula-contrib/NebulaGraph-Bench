@@ -67,13 +67,15 @@ func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
         driver.workload = p
     }
 
-    if cfg.MysqlDSN != "" {
+    for ; cfg.MysqlDSN != ""; {
         if db,e := sql.Open("mysql", cfg.MysqlDSN); e != nil {
             return nil, e
         } else if e := db.Ping(); e != nil {
-            return nil,e
+            log.Println(e)
+            break
         } else if res,e := db.Exec(`INSERT INTO tests(name) VALUES(?)`, cfg.Name); e != nil {
-            return nil,e
+            log.Println(e)
+            break
         } else {
             driver.db = db
             driver.test_id,_ = res.LastInsertId()
