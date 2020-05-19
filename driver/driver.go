@@ -80,6 +80,7 @@ func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
             driver.db = db
             driver.test_id,_ = res.LastInsertId()
         }
+        break
     }
 
     driver.config = cfg

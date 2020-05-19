@@ -18,7 +18,7 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "batch-count": 40,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT VERTEX person(first_name,last_name,gender,ip,browser) VALUES $LOOP$ $2$:(\"$3$\",\"$4$\",\"$5$\",\"$7$\",\"$8$\")$END$"
+                "stmt-template": "INSERT VERTEX person(first_name,last_name,gender,birthday,ip,browser) VALUES $LOOP$ $2$:(\"$3$\",\"$4$\",\"$5$\",\"$6$\",\"$7$\",\"$8$\")$END$"
             }, {
                 "file": "${base_dir}/static/place.csv",
                 "type": "template",
@@ -42,7 +42,15 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "repeatable": false,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT VERTEX hashtag(name,url) VALUES $1$:(\"$2$\",\"$3$\")"
+                "stmt-template": "INSERT VERTEX hashtag(name,url) VALUES $LOOP$ $1$:(\"$2$\",\"$3$\")$END$"
+            }, {
+                "file": "${base_dir}/static/tagclass.csv",
+                "type": "template",
+                "batch-count": 40,
+                "repeatable": false,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT VERTEX tagclass(name,url) VALUES $1$:(\"$2$\",\"$3$\")"
             }, {
                 "file": "${base_dir}/dynamic/post.csv",
                 "type": "template",
@@ -65,7 +73,47 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "repeatable": false,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT VERTEX forum(time,title,type) VALUES $2$:(\"$1$\",\"$3$\",\"$4$\")"
+                "stmt-template": "INSERT VERTEX forum(time,title,type) VALUES $LOOP$ $2$:(\"$1$\",\"$3$\",\"$4$\")$END$"
+            }, {
+                "file": "${base_dir}/static/tag_hasType_tagclass.csv",
+                "type": "template",
+                "batch-count": 40,
+                "repeatable": false,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE is_tagclass() VALUES $LOOP$ $1$ -> $2$:()$END$"
+            }, {
+                "file": "${base_dir}/static/tagclass_isSubclassOf_tagclass.csv",
+                "type": "template",
+                "batch-count": 40,
+                "repeatable": false,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE is_sub_of_tagclass() VALUES $LOOP$ $1$ -> $2$:()$END$"
+            }, {
+                "file": "${base_dir}/dynamic/forum_containerOf_post.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE contains_post(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
+            }, {
+                "file": "${base_dir}/dynamic/forum_hasTag_tag.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE forum_has_tag(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
+            }, {
+                "file": "${base_dir}/dynamic/forum_hasModerator_person.csv",
+                "type": "template",
+                "repeatable": false,
+                "batch-count": 40,
+                "csv-separator": "|",
+                "csv-skip-header": 1,
+                "stmt-template": "INSERT EDGE has_moderator(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
             }, {
                 "file": "${base_dir}/dynamic/person_knows_person.csv",
                 "type": "template",
@@ -73,7 +121,7 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "batch-count": 40,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT EDGE knows() VALUES $LOOP$ $2$ -> $3$:()$END$"
+                "stmt-template": "INSERT EDGE knows(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
             }, {
                 "file": "${base_dir}/dynamic/comment_replyOf_comment.csv",
                 "type": "template",
@@ -145,7 +193,7 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "batch-count": 40,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT EDGE comment_has_tag() VALUES $LOOP$ $2$ -> $3$:()$END$"
+                "stmt-template": "INSERT EDGE comment_has_tag(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
             },{
                 "file": "${base_dir}/dynamic/post_hasTag_tag.csv",
                 "type": "template",
@@ -153,7 +201,7 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "batch-count": 40,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT EDGE post_has_tag() VALUES $LOOP$ $2$ -> $3$:()$END$"
+                "stmt-template": "INSERT EDGE post_has_tag(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
             },{
                 "file": "${base_dir}/dynamic/person_hasInterest_tag.csv",
                 "type": "template",
@@ -161,7 +209,7 @@ var base_dir = /home/dutor.hou/Wdir/ldbc_snb_datagen/social_network
                 "batch-count": 40,
                 "csv-separator": "|",
                 "csv-skip-header": 1,
-                "stmt-template": "INSERT EDGE person_has_tag() VALUES $LOOP$ $2$ -> $3$:()$END$"
+                "stmt-template": "INSERT EDGE person_has_tag(time) VALUES $LOOP$ $2$ -> $3$:(\"$1$\")$END$"
             }, {
                 "file": "${base_dir}/dynamic/person_workAt_organisation.csv",
                 "type": "template",
