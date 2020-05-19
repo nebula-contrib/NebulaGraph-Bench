@@ -39,6 +39,7 @@ type BenchConfig struct {
     GraphDaemons        []Address       `json:"graph-daemons"`
     User                string          `json:"user"`
     Pass                string          `json:"pass"`
+    Space               string          `json:"space"`
     Rate                int             `json:"rate"`
     Concurrent          int             `json:"concurrent"`
     Workload            WorkloadConfig  `json:"workload"`

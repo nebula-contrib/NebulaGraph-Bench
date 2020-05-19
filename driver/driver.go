@@ -49,7 +49,7 @@ func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
             return nil, e
         } else if e = c.Connect(cfg.User, cfg.Pass); e != nil {
             return nil, e
-        } else if _,e := c.Execute("USE ldbc_snb"); e != nil {
+        } else if _,e := c.Execute("USE " + cfg.Space); e != nil {
             return nil, e
         } else {
             driver.clients = append(driver.clients, c)

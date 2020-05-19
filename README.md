@@ -38,6 +38,7 @@ var base = /path/to/base/dir/of/workload/file
   * `graph-daemons`, list of IP and port of **Nebula Graph** daemons
   * `user`, username.
   * `pass`, password.
+  * `space`, graph space.
   * `rate`, upper bound of QPS.
   * `concurrent`, number of synchronous connections.
   * `mysql-dsn`, DSN of MySQL, used to store the result of the benchmark, the format is as `user:pass@ip:port/database`.
