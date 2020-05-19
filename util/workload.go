@@ -199,6 +199,7 @@ func NewTemplatedStmtWorkload(cfg *WorkloadConfig) (*TemplatedStmtWorkload, erro
     }
     workload.reader = csv.NewReader(workload.file)
     workload.reader.ReuseRecord = true
+    workload.reader.TrimLeadingSpace = true
     workload.reader.FieldsPerRecord = -1
     if r,_ := utf8.DecodeRuneInString(workload.cfg.CsvSeparator); r == utf8.RuneError {
         return nil,errors.New("Illegal csv-separator")
