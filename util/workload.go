@@ -299,8 +299,8 @@ func (this *TemplatedStmtWorkload) singleRead() {
 func (this *TemplatedStmtWorkload) batchRead() {
     var cord Cord
     batch := this.cfg.Batch
-    if batch < 16 {
-        batch = 16
+    if batch < 1 {
+        batch = 1
     }
     skipped := 0
 Loop:
