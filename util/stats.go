@@ -3,8 +3,12 @@ package util
 import (
     "time"
     "log"
+    "fmt"
     "sync"
     "database/sql"
+    "strconv"
+    "os"
+    "encoding/csv"
 )
 
 const (
@@ -35,7 +39,8 @@ type Stats struct {
     name                string
     done                chan bool
     ticker             *time.Ticker
-    hist                Histogram
+    current             Histogram
+    overall             Histogram
     trends              []*Metric
     lock                sync.Mutex
     lastid              int64
@@ -43,7 +48,8 @@ type Stats struct {
 
 func NewStats(name string) *Stats {
     stats := &Stats{}
-    stats.hist = newHist()
+    stats.current = newHist()
+    stats.overall = newHist()
     stats.name = name
     stats.done = make(chan bool)
     stats.lastid = 0
@@ -66,22 +72,24 @@ func (this *Stats) Add(us int) {
         idx = kBucketNum - 1
     }
     this.lock.Lock()
-    this.hist.buckets[idx]++
-    this.hist.num++
+    this.current.buckets[idx]++
+    this.current.num++
+    this.overall.buckets[idx]++
+    this.overall.num++
     this.lock.Unlock()
 }
 
-func (this *Stats) collect(hist Histogram) {
+func (this *Stats) collect(hist Histogram) *Metric {
+    metric := &Metric{}
     if hist.num == 0 {
-        return
+        return metric
     }
     duration := time.Since(hist.start)
     ms := duration.Milliseconds()
     // Ignore this interval if too short
     if ms == 0 {
-        return
+        return metric
     }
-    metric := &Metric{}
     metric.qps = hist.num * 1000 / ms
     metric.id = this.lastid
     this.lastid++
@@ -117,7 +125,7 @@ func (this *Stats) collect(hist Histogram) {
     metric.p99 = p99
     metric.p95 = p95
     log.Printf("[%s] %+v\n", this.name, *metric)
-    this.trends = append(this.trends, metric)
+    return metric
 }
 
 func (this *Stats) tick() {
@@ -125,14 +133,14 @@ Loop:
     for {
         select {
         case <-this.done:
-            this.collect(this.hist)
+            this.trends = append(this.trends, this.collect(this.current))
             break Loop
         case <-this.ticker.C:
             this.lock.Lock()
-            cur := this.hist
-            this.hist = newHist()
+            cur := this.current
+            this.current = newHist()
             this.lock.Unlock()
-            this.collect(cur)
+            this.trends = append(this.trends, this.collect(cur))
         }
     }
     this.done <- true
@@ -142,6 +150,81 @@ func (this *Stats) Done() {
     this.ticker.Stop()
     this.done <- true
     <-this.done
+}
+
+func (this *Stats) PlotTrends(file string) error {
+    return nil
+}
+
+func (this *Stats) WriteTrendsToCSV(file string) error {
+    var writer *csv.Writer
+    if f,e := os.Create(file); e != nil {
+        return e
+    } else {
+        defer f.Close()
+        writer = csv.NewWriter(f)
+        defer writer.Flush()
+    }
+    writer.Comma = []rune("\t")[0]
+
+    var rows [][]string
+    rows = append(rows, []string{"id", "ts", "qps", "avg", "P99", "p95", "P999", "samples"})
+    for _,m := range this.trends {
+        var row []string
+        row = append(row, strconv.FormatInt(m.id, 10))
+        row = append(row, strconv.FormatInt(m.ts, 10))
+        row = append(row, strconv.FormatInt(m.qps, 10))
+        row = append(row, strconv.FormatInt(m.avg, 10))
+        row = append(row, strconv.FormatInt(m.p99, 10))
+        row = append(row, strconv.FormatInt(m.p95, 10))
+        row = append(row, strconv.FormatInt(m.p999, 10))
+        row = append(row, strconv.FormatInt(m.samples, 10))
+        rows = append(rows, row)
+    }
+    writer.WriteAll(rows)
+
+    return nil
+}
+
+func (this *Stats) WriteHistToCSV(file string) error {
+    var writer *csv.Writer
+    if f,e := os.Create(file); e != nil {
+        return e
+    } else {
+        defer f.Close()
+        writer = csv.NewWriter(f)
+        defer writer.Flush()
+    }
+    writer.Comma = []rune("\t")[0]
+
+    var rows [][]string
+    rows = append(rows, []string{"ms", "samples"})
+    var maxBucket int = kBucketNum
+    for i := kBucketNum - 1; i > 0; i-- {
+        if this.overall.buckets[i] != 0 {
+            maxBucket = i
+            break
+        }
+    }
+    step := 1000 / kBucketWidth;
+    for i := 0; i < maxBucket; i += step {
+        var row []string
+        ms := int64(i / step)
+        var sum int64 = 0
+        for j := i; j < i + step; j++ {
+            sum += int64(this.overall.buckets[j])
+        }
+        row = append(row, strconv.FormatInt(ms, 10))
+        row = append(row, strconv.FormatInt(sum, 10))
+        rows = append(rows, row)
+    }
+    writer.WriteAll(rows)
+
+    return nil
+}
+
+func (this *Stats) OverallMetric() string {
+    return fmt.Sprintf("[%s][overall] %+v", this.name, *this.collect(this.overall))
 }
 
 func (this *Stats) WriteToDB(db *sql.DB, test_id int64) {

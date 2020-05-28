@@ -14,6 +14,6 @@ var base = /old-home/dutor.hou/Wdir/ldbc_snb_datagen/snb/sf1000
         "repeatable": true,
         "csv-separator": "|",
         "csv-skip-header": 1,
-        "stmt-template": "GO 1 STEP FROM $2$ OVER knows"
+        "stmt-template": "GO 1 STEP FROM $2$ OVER knows WHERE false"
     }
 }
