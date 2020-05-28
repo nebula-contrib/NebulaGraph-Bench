@@ -9,6 +9,11 @@ for prefix in ${prefixes[@]}
 do
     files=( $(ls -1 ${prefix}_[0-9]* | awk -F_ '{print $0,":",$(NF-1)}' | sort -t: -k2,2 -n | cut -d: -f1) )
     nr_files=${#files[@]}
+    if [[ $nr_files -eq 1 ]]
+    then
+        mv ${files[0]} $prefix.csv
+        continue
+    fi
     lines=$(($(wc -l ${files[@]} | tail -1 | awk '{print $1}') - ${nr_files} + 1))
     echo "Files to merge:"
     printf "%s\n" "${files[@]}"

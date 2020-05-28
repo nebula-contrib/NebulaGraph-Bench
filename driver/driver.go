@@ -92,7 +92,6 @@ func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
 
 func (this *Driver) send(idx int, ctx context.Context) {
     defer this.wg.Done()
-    sum := 0
     c := this.workload.Stream()
 Loop:
     for {
@@ -107,17 +106,17 @@ Loop:
             }
             start := time.Now()
             //resp,_ := this.clients[idx].Execute("show spaces")
-            resp,_ := this.clients[idx].Execute(s)
-            if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
-                log.Printf("ErrorCode: %v, ErrorMsg: %s", resp.GetErrorCode(), resp.GetErrorMsg())
-                log.Printf("Statement: %s", s)
+            if resp,e := this.clients[idx].Execute(s); e != nil {
+                log.Println(e)
+            } else if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
+                log.Printf("Statement: %s, ErrorCode: %v, ErrorMsg: %s",
+                           s, resp.GetErrorCode(), resp.GetErrorMsg())
+            } else {
+                this.sstats.Add(int(resp.LatencyInUs))
+                this.cstats.Add(int(time.Since(start).Microseconds()))
             }
-            this.sstats.Add(int(resp.LatencyInUs))
-            this.cstats.Add(int(time.Since(start).Microseconds()))
-            sum++
         }
     }
-    //log.Printf("# of Lines: %v\n", sum)
 }
 
 func (this *Driver) Start() {
