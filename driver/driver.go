@@ -137,6 +137,10 @@ func (this *Driver) Start() {
             this.sstats.WriteToDB(this.db, this.test_id)
             this.cstats.WriteToDB(this.db, this.test_id)
         }
+        this.sstats.WriteTrendsToCSV("server-side-qps-latency-trends.csv")
+        this.sstats.WriteHistToCSV("server-side-latency-hist.csv")
+        log.Println(this.sstats.OverallMetric())
+        log.Println(this.cstats.OverallMetric())
         this.done <- 0
     }()
 }
