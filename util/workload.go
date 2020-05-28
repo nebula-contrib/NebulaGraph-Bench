@@ -4,7 +4,9 @@ import (
     "os"
     "log"
     "io"
+    "fmt"
     "math"
+    "path"
     "bufio"
     "errors"
     "regexp"
@@ -15,6 +17,7 @@ import (
 
 type QueryWorkload interface {
     Stream() <-chan string
+    Info() string
 }
 
 type LiteralStmtWorkload struct {
@@ -79,7 +82,7 @@ func NewWorkload(cfg *WorkloadConfig) (QueryWorkload, error) {
 /* LiteralStmtPlayload */
 func NewLiteralStmtWorkload(cfg *WorkloadConfig) (*LiteralStmtWorkload, error) {
     workload := &LiteralStmtWorkload{}
-    workload.stream = make(chan string, (1 << 20))
+    workload.stream = make(chan string, (1 << 18))
     workload.cfg = cfg
 
     if e := workload.newReader(); e != nil {
@@ -98,7 +101,7 @@ func NewUniqueStmtWorkload(cfg *WorkloadConfig) (*UniqueStmtWorkload, error) {
 
     workload := &UniqueStmtWorkload{}
     workload.cfg = cfg
-    workload.stream = make(chan string, (1 << 20))
+    workload.stream = make(chan string, (1 << 18))
 
     go workload.gen()
 
@@ -112,7 +115,7 @@ func NewJoinedWorkload(cfg *WorkloadConfig) (*JoinedWorkload, error) {
 
     workload := &JoinedWorkload{}
     workload.cfg = cfg
-    workload.stream = make(chan string, (1 <<20))
+    workload.stream = make(chan string, (1 << 18))
 
     for i := 0; i < len(cfg.List); i++ {
         if p,e := NewWorkload(&cfg.List[i]); e != nil {
@@ -136,7 +139,7 @@ func (this *LiteralStmtWorkload) newReader() error {
         this.file = file
     }
 
-    this.reader = bufio.NewReaderSize(this.file, (1 << 20))
+    this.reader = bufio.NewReaderSize(this.file, (1 << 18))
     return nil
 }
 
@@ -182,6 +185,9 @@ func (this *LiteralStmtWorkload) Stream() <-chan string {
     return this.stream
 }
 
+func (this *LiteralStmtWorkload) Info() string {
+    return fmt.Sprintf("[%s:%s]", this.cfg.Type, path.Base(this.cfg.File))
+}
 
 /* TemplatedStmtWorkload */
 func NewTemplatedStmtWorkload(cfg *WorkloadConfig) (*TemplatedStmtWorkload, error) {
@@ -206,7 +212,7 @@ func NewTemplatedStmtWorkload(cfg *WorkloadConfig) (*TemplatedStmtWorkload, erro
     } else {
         workload.reader.Comma = r
     }
-    workload.stream = make(chan string, (1 << 20))
+    workload.stream = make(chan string, (1 << 18))
 
     go workload.read()
 
@@ -354,6 +360,10 @@ func (this *TemplatedStmtWorkload) Stream() <-chan string {
     return this.stream
 }
 
+func (this *TemplatedStmtWorkload) Info() string {
+    return fmt.Sprintf("[%s:%s]", this.cfg.Type, path.Base(this.cfg.File))
+}
+
 func (this *UniqueStmtWorkload) gen() {
     limit := this.cfg.Limit
     if limit <= 0 {
@@ -371,11 +381,16 @@ func (this *UniqueStmtWorkload) Stream() <-chan string {
     return this.stream
 }
 
+func (this *UniqueStmtWorkload) Info() string {
+    return fmt.Sprintf("[%s:%s]", this.cfg.Type, path.Base(this.cfg.File))
+}
+
 func (this *JoinedWorkload) read() {
     n := len(this.list)
 
     for i := 0; i < n; i++ {
         c := this.list[i].Stream()
+        log.Printf("Starting sending %s", this.list[i].Info())
         for {
             if s,ok := <-c; !ok {
                 break
@@ -390,4 +405,8 @@ func (this *JoinedWorkload) read() {
 
 func (this *JoinedWorkload) Stream() <-chan string {
     return this.stream
+}
+
+func (this *JoinedWorkload) Info() string {
+    return fmt.Sprintf("[%s:%s]", this.cfg.Type, path.Base(this.cfg.File))
 }
