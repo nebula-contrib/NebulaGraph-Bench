@@ -124,23 +124,27 @@ func (this *Stats) collect(hist Histogram) *Metric {
     metric.p999 = p999
     metric.p99 = p99
     metric.p95 = p95
-    log.Printf("[%s] %+v\n", this.name, *metric)
     return metric
 }
 
 func (this *Stats) tick() {
+    var metric *Metric
 Loop:
     for {
         select {
         case <-this.done:
-            this.trends = append(this.trends, this.collect(this.current))
+            metric = this.collect(this.current)
+            this.trends = append(this.trends, metric)
+            log.Printf("[%s] %+v\n", this.name, *metric)
             break Loop
         case <-this.ticker.C:
             this.lock.Lock()
             cur := this.current
             this.current = newHist()
             this.lock.Unlock()
-            this.trends = append(this.trends, this.collect(cur))
+            metric = this.collect(cur)
+            this.trends = append(this.trends, metric)
+            log.Printf("[%s] %+v\n", this.name, *metric)
         }
     }
     this.done <- true
