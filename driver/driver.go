@@ -2,6 +2,7 @@ package driver
 
 import (
     "log"
+    "fmt"
     "time"
     "context"
     "sync"
@@ -139,8 +140,8 @@ func (this *Driver) Start() {
         }
         this.sstats.WriteTrendsToCSV("server-side-qps-latency-trends.csv")
         this.sstats.WriteHistToCSV("server-side-latency-hist.csv")
-        log.Println(this.sstats.OverallMetric())
-        log.Println(this.cstats.OverallMetric())
+        fmt.Println(this.sstats.OverallMetric())
+        fmt.Println(this.cstats.OverallMetric())
         this.done <- 0
     }()
 }
