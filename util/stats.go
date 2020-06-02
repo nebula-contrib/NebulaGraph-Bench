@@ -39,8 +39,8 @@ type Stats struct {
     name                string
     done                chan bool
     ticker             *time.Ticker
-    current             Histogram
-    overall             Histogram
+    current            *Histogram
+    overall            *Histogram
     trends              []*Metric
     lock                sync.Mutex
     lastid              int64
@@ -58,8 +58,8 @@ func NewStats(name string) *Stats {
     return stats
 }
 
-func newHist() Histogram {
-    var hist Histogram
+func newHist() *Histogram {
+    hist := &Histogram{}
     hist.buckets = make([]uint32, kBucketNum)
     hist.start = time.Now()
     hist.num = 0
@@ -79,7 +79,7 @@ func (this *Stats) Add(us int) {
     this.lock.Unlock()
 }
 
-func (this *Stats) collect(hist Histogram) *Metric {
+func (this *Stats) collect(hist *Histogram) *Metric {
     metric := &Metric{}
     if hist.num == 0 {
         return metric
@@ -135,7 +135,7 @@ Loop:
         case <-this.done:
             metric = this.collect(this.current)
             this.trends = append(this.trends, metric)
-            log.Printf("[%s] %+v\n", this.name, *metric)
+            //log.Printf("[%s] %+v\n", this.name, *metric)
             break Loop
         case <-this.ticker.C:
             this.lock.Lock()
@@ -144,7 +144,7 @@ Loop:
             this.lock.Unlock()
             metric = this.collect(cur)
             this.trends = append(this.trends, metric)
-            log.Printf("[%s] %+v\n", this.name, *metric)
+            //log.Printf("[%s] %+v\n", this.name, *metric)
         }
     }
     this.done <- true
