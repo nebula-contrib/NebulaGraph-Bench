@@ -135,7 +135,7 @@ Loop:
         case <-this.done:
             metric = this.collect(this.current)
             this.trends = append(this.trends, metric)
-            //log.Printf("[%s] %+v\n", this.name, *metric)
+            log.Printf("[%s] %+v\n", this.name, *metric)
             break Loop
         case <-this.ticker.C:
             this.lock.Lock()
@@ -144,7 +144,7 @@ Loop:
             this.lock.Unlock()
             metric = this.collect(cur)
             this.trends = append(this.trends, metric)
-            //log.Printf("[%s] %+v\n", this.name, *metric)
+            log.Printf("[%s] %+v\n", this.name, *metric)
         }
     }
     this.done <- true

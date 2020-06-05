@@ -10,7 +10,6 @@ import (
     "runtime"
     "database/sql"
     "golang.org/x/time/rate"
-    "sync/atomic"
     _ "github.com/go-sql-driver/mysql"
     "github.com/dutor/nebula-bench/util"
     nebula "github.com/vesoft-inc/nebula-go"
@@ -29,8 +28,6 @@ type Driver struct {
     cstats         *util.Stats
     wg             *sync.WaitGroup
     db             *sql.DB
-    degree          [8<<20]int
-    didx            int64
     test_id         int64
     done            chan int
 }
@@ -109,7 +106,6 @@ Loop:
                 break Loop
             }
             start := time.Now()
-            //resp,_ := this.clients[idx].Execute("show spaces")
             if resp,e := this.clients[idx].Execute(s); e != nil {
                 log.Println(e)
             } else if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
@@ -118,8 +114,6 @@ Loop:
             } else {
                 this.sstats.Add(int(resp.LatencyInUs))
                 this.cstats.Add(int(time.Since(start).Microseconds()))
-                i := atomic.AddInt64(&this.didx, 1)
-                this.degree[i-1] = len(resp.Rows)
             }
         }
     }
@@ -147,9 +141,6 @@ func (this *Driver) Start() {
         this.sstats.WriteHistToCSV("server-side-latency-hist.csv")
         fmt.Println(this.sstats.OverallMetric())
         fmt.Println(this.cstats.OverallMetric())
-        for i := this.didx - 1; i >= 0; i-- {
-            fmt.Printf("%d\n", this.degree[i])
-        }
         this.done <- 0
     }()
 }
