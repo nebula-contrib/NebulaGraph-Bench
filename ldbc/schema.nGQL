@@ -1,6 +1,6 @@
-CREATE SPACE IF NOT EXISTS ldbc_snb(PARTITION_NUM = 24, REPLICA_FACTOR = 1)
+CREATE SPACE IF NOT EXISTS ldbc_snb_sf300(PARTITION_NUM = 24, REPLICA_FACTOR = 1)
 
-USE ldbc_snb
+USE ldbc_snb_sf300
 
 CREATE TAG IF NOT EXISTS person(first_name string, last_name string, gender string, birthday string, ip string, browser string)
 CREATE TAG IF NOT EXISTS place(name string, type string, url string)
