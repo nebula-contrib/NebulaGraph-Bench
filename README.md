@@ -6,7 +6,7 @@ Collection of benchmark services and tools for Nebula Graph
 Note that you need to setup your Golang environment before build.
 
 ```shell
-$ git clone https://github.com/dutor/nebula-bench.git
+$ git clone https://github.com/vesoft-inc/nebula-bench.git
 $ cd nebula-bench
 $ go build ./bin/nb
 ```
