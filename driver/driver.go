@@ -17,6 +17,11 @@ import (
 	"golang.org/x/time/rate"
 )
 
+const (
+	latency_schema = `CREATE TABLE IF NOT EXISTS latency(graph_version VARCHAR(200) DEFAULT '', meta_version VARCHAR(200) DEFAULT '',
+		storage_version VARCHAR(200) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
+)
+
 type Driver struct {
 	counter    uint64
 	lock       sync.Mutex
@@ -74,10 +79,10 @@ func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
 			return nil, e
 		} else if e := db.Ping(); e != nil {
 			log.Println(e)
-			break
-		} else if res, e := db.Exec(`INSERT INTO tests(name) VALUES(?)`, cfg.Name); e != nil {
+			return nil, e
+		} else if res, e := db.Exec(latency_schema); e != nil {
 			log.Println(e)
-			break
+			return nil, e
 		} else {
 			driver.db = db
 			driver.test_id, _ = res.LastInsertId()

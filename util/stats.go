@@ -20,13 +20,13 @@ const (
 
 type Metric struct {
 	id      int64
-	ts      int64
+	ts      time.Time
 	samples int64
 	qps     int64
-	avg     int64
-	p999    int64
-	p99     int64
-	p95     int64
+	avg     float64
+	p999    float64
+	p99     float64
+	p95     float64
 }
 
 type Histogram struct {
@@ -94,33 +94,34 @@ func (this *Stats) collect(hist *Histogram) *Metric {
 	metric.id = this.lastid
 	this.lastid++
 	metric.samples = hist.num
-	metric.ts = time.Now().Unix()
-	var total_us int64 = 0
+	metric.ts = time.Now()
+	metric.ts.Format(time.RFC3339)
+	var total_us int64
 	var p999_limit int64 = hist.num / 1000
 	var p999_count int64 = 0
-	var p999 int64 = 0
+	var p999 float64
 	var p99_limit int64 = hist.num / 100
 	var p99_count int64 = 0
-	var p99 int64 = 0
+	var p99 float64
 	var p95_limit int64 = hist.num * 5 / 100
 	var p95_count int64 = 0
-	var p95 int64 = 0
+	var p95 float64
 	for i := kBucketNum - 1; i >= 0; i-- {
 		total_us += kBucketWidth * int64(hist.buckets[i]) * int64(i)
 		if p999_count < p999_limit {
 			p999_count += int64(hist.buckets[i])
-			p999 = int64(i * kBucketWidth)
+			p999 = float64(i*kBucketWidth) * 0.001
 		}
 		if p99_count < p99_limit {
 			p99_count += int64(hist.buckets[i])
-			p99 = int64(i * kBucketWidth)
+			p99 = float64(i*kBucketWidth) * 0.001
 		}
 		if p95_count < p95_limit {
 			p95_count += int64(hist.buckets[i])
-			p95 = int64(i * kBucketWidth)
+			p95 = float64(i*kBucketWidth) * 0.001
 		}
 	}
-	metric.avg = total_us / hist.num
+	metric.avg = float64(total_us/hist.num) * 0.001
 	metric.p999 = p999
 	metric.p99 = p99
 	metric.p95 = p95
@@ -176,12 +177,12 @@ func (this *Stats) WriteTrendsToCSV(file string) error {
 	for _, m := range this.trends {
 		var row []string
 		row = append(row, strconv.FormatInt(m.id, 10))
-		row = append(row, strconv.FormatInt(m.ts, 10))
+		row = append(row, m.ts.String())
 		row = append(row, strconv.FormatInt(m.qps, 10))
-		row = append(row, strconv.FormatInt(m.avg, 10))
-		row = append(row, strconv.FormatInt(m.p99, 10))
-		row = append(row, strconv.FormatInt(m.p95, 10))
-		row = append(row, strconv.FormatInt(m.p999, 10))
+		row = append(row, strconv.FormatFloat(m.avg, 'E', 2, 64))
+		row = append(row, strconv.FormatFloat(m.p99, 'E', 2, 64))
+		row = append(row, strconv.FormatFloat(m.p95, 'E', 2, 64))
+		row = append(row, strconv.FormatFloat(m.p999, 'E', 2, 64))
 		row = append(row, strconv.FormatInt(m.samples, 10))
 		rows = append(rows, row)
 	}
@@ -233,8 +234,9 @@ func (this *Stats) OverallMetric() string {
 
 func (this *Stats) WriteToDB(db *sql.DB, test_id int64) {
 	for _, m := range this.trends {
-		if _, e := db.Exec(`INSERT INTO latency(type, timestamp,samples,qps,average,p95,p99,p999,test)
-        VALUES(?,?,?,?,?,?,?,?,?)`, this.name, m.ts, m.samples, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
+		println(m.ts.String())
+		if _, e := db.Exec(`INSERT INTO latency(type, timestamp, samples,qps,average,p95,p99,p999,test)
+        VALUES(?,NOW(),?,?,?,?,?,?,?)`, this.name, m.samples, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
 			log.Fatal(e)
 		}
 	}
