@@ -1,6 +1,8 @@
 # nebula-bench
 Collection of benchmark services and tools for Nebula Graph
 
+![build status](https://github.com/vesoft-inc/nebula-bench/workflows/build/badge.svg)
+
 ## Build
 
 Note that you need to setup your Golang environment before build.
