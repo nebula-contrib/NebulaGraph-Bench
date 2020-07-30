@@ -19,5 +19,7 @@ jobs:
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
-    - name: Build
+    - name: Build 1.0
       run: go build -v ./bin/nb
+    - name: Build 2.0
+      run: go build -v ./bin/nb2
