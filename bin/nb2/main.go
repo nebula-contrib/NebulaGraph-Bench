@@ -31,11 +31,13 @@ var bctx *BenchContext = nil
 var flagBenchFile string
 var flagHttpPort int
 var cpuProfile string
+var outputDBOnce bool
 
 func initFlags() {
 	flag.StringVar(&flagBenchFile, "bench-config", "", "Path to the configuration file for the local mode")
 	flag.IntVar(&flagHttpPort, "port", 3728, "Port to listen on for the server mode")
 	flag.StringVar(&cpuProfile, "cpu-profile", "", "Turn on CPU profiling if this is a non-empty filename")
+	flag.BoolVar(&outputDBOnce, "db-once", false, "Whether to output statistics to DB after all tests have been run")
 }
 
 func startWithServerMode() error {
@@ -61,7 +63,7 @@ func startWithLocalMode() error {
 
 	fmt.Printf("bench-config: %v\n", config)
 
-	if d, e := driver.NewDriver(config); e != nil {
+	if d, e := driver.NewDriver(config, outputDBOnce); e != nil {
 		return e
 	} else {
 		bctx.current = d
@@ -136,7 +138,7 @@ func startTaskHandler(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, "Illegal json")
 			break
 		}
-		if d, e := driver.NewDriver(config); e != nil {
+		if d, e := driver.NewDriver(config, outputDBOnce); e != nil {
 			io.WriteString(w, "Create Driver failed")
 			break
 		} else {

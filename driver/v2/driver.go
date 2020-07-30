@@ -19,26 +19,27 @@ import (
 
 const (
 	latency_schema = `CREATE TABLE IF NOT EXISTS latency(graph_version VARCHAR(200) DEFAULT '', meta_version VARCHAR(200) DEFAULT '',
-		storage_version VARCHAR(200) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
+		storage_version VARCHAR(200) DEFAULT '', name VARCHAR(50) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
 )
 
 type Driver struct {
-	counter    uint64
-	lock       sync.Mutex
-	config     *util.BenchConfig
-	limiters   []*rate.Limiter
-	clients    []*nebula.GraphClient
-	cancellers []context.CancelFunc
-	workload   util.QueryWorkload
-	sstats     *util.Stats
-	cstats     *util.Stats
-	wg         *sync.WaitGroup
-	db         *sql.DB
-	test_id    int64
-	done       chan int
+	counter      uint64
+	lock         sync.Mutex
+	config       *util.BenchConfig
+	limiters     []*rate.Limiter
+	clients      []*nebula.GraphClient
+	cancellers   []context.CancelFunc
+	workload     util.QueryWorkload
+	sstats       *util.Stats
+	cstats       *util.Stats
+	wg           *sync.WaitGroup
+	db           *sql.DB
+	test_id      int64
+	done         chan int
+	outputDBOnce bool
 }
 
-func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
+func NewDriver(cfg *util.BenchConfig, outputDBOnce bool) (*Driver, error) {
 	if cfg == nil {
 		return nil, errors.New("BenchConfig is nil")
 	}
@@ -91,8 +92,9 @@ func NewDriver(cfg *util.BenchConfig) (*Driver, error) {
 	}
 
 	driver.config = cfg
-	driver.sstats = util.NewStats("server-side")
-	driver.cstats = util.NewStats("client-side")
+	driver.sstats = util.NewStats("server-side", cfg.Name)
+	driver.cstats = util.NewStats("client-side", cfg.Name)
+	driver.outputDBOnce = outputDBOnce
 
 	return driver, nil
 }
@@ -140,8 +142,8 @@ func (this *Driver) Start() {
 		this.sstats.Done()
 		this.cstats.Done()
 		if this.db != nil {
-			this.sstats.WriteToDB(this.db, this.test_id)
-			this.cstats.WriteToDB(this.db, this.test_id)
+			this.sstats.WriteToDB(this.db, this.test_id, this.outputDBOnce)
+			this.cstats.WriteToDB(this.db, this.test_id, this.outputDBOnce)
 		}
 		this.sstats.WriteTrendsToCSV("server-side-qps-latency-trends.csv")
 		this.sstats.WriteHistToCSV("server-side-latency-hist.csv")
