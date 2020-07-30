@@ -4,5 +4,7 @@ github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gG
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/vesoft-inc/nebula-go v1.0.0 h1:4fwXEH2xGWVc54C7QofKh5r2a2oJb6C/BuC2BmqEQlE=
 github.com/vesoft-inc/nebula-go v1.0.0/go.mod h1:dM1R7vZjYCXZ20Kie4KYGS0UHxVDNYmDeMgb1PFPDmw=
+github.com/vesoft-inc/nebula-go/v2 v2.0.0-20200727080130-7da40daa0aba h1:x5El786ZTGnUcwWm/f/pdM3uLC48u4pjX5VevbPtbx4=
+github.com/vesoft-inc/nebula-go/v2 v2.0.0-20200727080130-7da40daa0aba/go.mod h1:92I8vrIc2Rk7/oJO+1hTgjNhHiYfnsW2uu3Ofh0ECnI=
 golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e h1:EHBhcS0mlXEAVwNyO2dLfjToGsyY4j24pTs2ScHnX7s=
 golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
