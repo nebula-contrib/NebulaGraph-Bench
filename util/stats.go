@@ -36,17 +36,18 @@ type Histogram struct {
 }
 
 type Stats struct {
-	name    string
-	done    chan bool
-	ticker  *time.Ticker
-	current *Histogram
-	overall *Histogram
-	trends  []*Metric
-	lock    sync.Mutex
-	lastid  int64
+	name     string
+	testName string
+	done     chan bool
+	ticker   *time.Ticker
+	current  *Histogram
+	overall  *Histogram
+	trends   []*Metric
+	lock     sync.Mutex
+	lastid   int64
 }
 
-func NewStats(name string) *Stats {
+func NewStats(name string, testName string) *Stats {
 	stats := &Stats{}
 	stats.current = newHist()
 	stats.overall = newHist()
@@ -54,6 +55,7 @@ func NewStats(name string) *Stats {
 	stats.done = make(chan bool)
 	stats.lastid = 0
 	stats.ticker = time.NewTicker(kInterval * time.Second)
+	stats.testName = testName
 	go stats.tick()
 	return stats
 }
@@ -110,18 +112,18 @@ func (this *Stats) collect(hist *Histogram) *Metric {
 		total_us += kBucketWidth * int64(hist.buckets[i]) * int64(i)
 		if p999_count < p999_limit {
 			p999_count += int64(hist.buckets[i])
-			p999 = float64(i*kBucketWidth) * 0.001
+			p999 = float64(i*kBucketWidth) / 1000
 		}
 		if p99_count < p99_limit {
 			p99_count += int64(hist.buckets[i])
-			p99 = float64(i*kBucketWidth) * 0.001
+			p99 = float64(i*kBucketWidth) / 1000
 		}
 		if p95_count < p95_limit {
 			p95_count += int64(hist.buckets[i])
-			p95 = float64(i*kBucketWidth) * 0.001
+			p95 = float64(i*kBucketWidth) / 1000
 		}
 	}
-	metric.avg = float64(total_us/hist.num) * 0.001
+	metric.avg = float64(total_us/hist.num) / 1000
 	metric.p999 = p999
 	metric.p99 = p99
 	metric.p95 = p95
@@ -232,12 +234,20 @@ func (this *Stats) OverallMetric() string {
 	return fmt.Sprintf("[%s][overall] %+v", this.name, *this.collect(this.overall))
 }
 
-func (this *Stats) WriteToDB(db *sql.DB, test_id int64) {
-	for _, m := range this.trends {
-		println(m.ts.String())
-		if _, e := db.Exec(`INSERT INTO latency(type, timestamp, samples,qps,average,p95,p99,p999,test)
-        VALUES(?,NOW(),?,?,?,?,?,?,?)`, this.name, m.samples, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
-			log.Fatal(e)
+func (this *Stats) writeDB(db *sql.DB, test_id int64, m *Metric) {
+	if _, e := db.Exec(`INSERT INTO latency(name, type, timestamp, samples,qps,average,p95,p99,p999,test) 
+		VALUES(?,?,NOW(),?,?,?,?,?,?,?)`, this.testName, this.name, m.samples, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
+		log.Fatal(e)
+	}
+}
+
+func (this *Stats) WriteToDB(db *sql.DB, test_id int64, once bool) {
+	if once {
+		this.writeDB(db, test_id, this.collect(this.overall))
+	} else {
+		for _, m := range this.trends {
+			println(m.ts.String())
+			this.writeDB(db, test_id, m)
 		}
 	}
 }
