@@ -27,11 +27,13 @@ type Metric struct {
 	p999    float64
 	p99     float64
 	p95     float64
+	err     int64
 }
 
 type Histogram struct {
 	buckets []uint32
 	num     int64
+	err     int64
 	start   time.Time
 }
 
@@ -64,8 +66,14 @@ func newHist() *Histogram {
 	hist := &Histogram{}
 	hist.buckets = make([]uint32, kBucketNum)
 	hist.start = time.Now()
-	hist.num = 0
 	return hist
+}
+
+func (this *Stats) AddErr() {
+	this.lock.Lock()
+	this.current.err++
+	this.overall.err++
+	this.lock.Unlock()
 }
 
 func (this *Stats) Add(us int) {
@@ -96,6 +104,7 @@ func (this *Stats) collect(hist *Histogram) *Metric {
 	metric.id = this.lastid
 	this.lastid++
 	metric.samples = hist.num
+	metric.err = hist.err
 	metric.ts = time.Now()
 	metric.ts.Format(time.RFC3339)
 	var total_us int64
@@ -175,7 +184,7 @@ func (this *Stats) WriteTrendsToCSV(file string) error {
 	writer.Comma = []rune("\t")[0]
 
 	var rows [][]string
-	rows = append(rows, []string{"id", "ts", "qps", "avg", "P99", "p95", "P999", "samples"})
+	rows = append(rows, []string{"id", "ts", "qps", "avg", "P99", "p95", "P999", "samples", "error"})
 	for _, m := range this.trends {
 		var row []string
 		row = append(row, strconv.FormatInt(m.id, 10))
@@ -186,6 +195,7 @@ func (this *Stats) WriteTrendsToCSV(file string) error {
 		row = append(row, strconv.FormatFloat(m.p95, 'E', 2, 64))
 		row = append(row, strconv.FormatFloat(m.p999, 'E', 2, 64))
 		row = append(row, strconv.FormatInt(m.samples, 10))
+		row = append(row, strconv.FormatInt(m.err, 10))
 		rows = append(rows, row)
 	}
 	writer.WriteAll(rows)
@@ -205,7 +215,7 @@ func (this *Stats) WriteHistToCSV(file string) error {
 	writer.Comma = []rune("\t")[0]
 
 	var rows [][]string
-	rows = append(rows, []string{"ms", "samples"})
+	rows = append(rows, []string{"ms", "samples", "error"})
 	var maxBucket int = kBucketNum
 	for i := kBucketNum - 1; i > 0; i-- {
 		if this.overall.buckets[i] != 0 {
@@ -223,6 +233,7 @@ func (this *Stats) WriteHistToCSV(file string) error {
 		}
 		row = append(row, strconv.FormatInt(ms, 10))
 		row = append(row, strconv.FormatInt(sum, 10))
+		row = append(row, strconv.FormatInt(this.current.err, 10))
 		rows = append(rows, row)
 	}
 	writer.WriteAll(rows)
@@ -235,8 +246,8 @@ func (this *Stats) OverallMetric() string {
 }
 
 func (this *Stats) writeDB(db *sql.DB, test_id int64, m *Metric) {
-	if _, e := db.Exec(`INSERT INTO latency(name, type, timestamp, samples,qps,average,p95,p99,p999,test) 
-		VALUES(?,?,NOW(),?,?,?,?,?,?,?)`, this.testName, this.name, m.samples, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
+	if _, e := db.Exec(`INSERT INTO latency(name, type, timestamp, samples, error, qps,average,p95,p99,p999,test) 
+		VALUES(?,?,NOW(),?,?,?,?,?,?,?,?)`, this.testName, this.name, m.samples, m.err, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
 		log.Fatal(e)
 	}
 }

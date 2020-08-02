@@ -19,7 +19,7 @@ import (
 
 const (
 	latency_schema = `CREATE TABLE IF NOT EXISTS latency(graph_version VARCHAR(200) DEFAULT '', meta_version VARCHAR(200) DEFAULT '',
-		storage_version VARCHAR(200) DEFAULT '', name VARCHAR(50) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
+		storage_version VARCHAR(200) DEFAULT '', name VARCHAR(50) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, error BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
 )
 
 type Driver struct {
@@ -116,9 +116,13 @@ Loop:
 			start := time.Now()
 			if resp, e := this.clients[idx].Execute(s); e != nil {
 				log.Println(e)
+				this.sstats.AddErr()
+				this.cstats.AddErr()
 			} else if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
 				log.Printf("Statement: %s, ErrorCode: %v, ErrorMsg: %s",
 					s, resp.GetErrorCode(), resp.GetErrorMsg())
+				this.sstats.AddErr()
+				this.cstats.AddErr()
 			} else {
 				this.sstats.Add(int(resp.LatencyInUs))
 				this.cstats.Add(int(time.Since(start).Microseconds()))
