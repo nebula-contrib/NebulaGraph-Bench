@@ -39,6 +39,27 @@ type Driver struct {
 	outputDBOnce bool
 }
 
+func connectGraph(cfg *util.BenchConfig, retry uint) (client *nebula.GraphClient, err error) {
+	var i uint
+	for i <= retry {
+		i++
+		client, err = nebula.NewClient(cfg.GraphDaemons[0].String(), nebula.WithTimeout(0))
+		if err != nil {
+			time.Sleep(2)
+			continue
+		} else if err = client.Connect(cfg.User, cfg.Pass); err != nil {
+			time.Sleep(2)
+			continue
+		} else if _, err := client.Execute("USE " + cfg.Space); err != nil {
+			time.Sleep(2)
+			client.Disconnect()
+			continue
+		}
+		break
+	}
+	return
+}
+
 func NewDriver(cfg *util.BenchConfig, outputDBOnce bool) (*Driver, error) {
 	if cfg == nil {
 		return nil, errors.New("BenchConfig is nil")
@@ -53,15 +74,11 @@ func NewDriver(cfg *util.BenchConfig, outputDBOnce bool) (*Driver, error) {
 
 	driver := &Driver{}
 	for i := 0; i < cfg.Concurrent; i++ {
-		if c, e := nebula.NewClient(cfg.GraphDaemons[0].String(), nebula.WithTimeout(0)); e != nil {
+		c, e := connectGraph(cfg, 2)
+		if e != nil {
 			return nil, e
-		} else if e = c.Connect(cfg.User, cfg.Pass); e != nil {
-			return nil, e
-		} else if _, e := c.Execute("USE " + cfg.Space); e != nil {
-			return nil, e
-		} else {
-			driver.clients = append(driver.clients, c)
 		}
+		driver.clients = append(driver.clients, c)
 	}
 
 	for i := 0; i < cfg.Concurrent; i++ {
@@ -116,6 +133,12 @@ Loop:
 			start := time.Now()
 			if resp, e := this.clients[idx].Execute(s); e != nil {
 				log.Println(e)
+				this.clients[idx].Disconnect()
+				this.clients[idx], e = connectGraph(this.config, 4)
+				if e != nil {
+					log.Println(e)
+					break Loop
+				}
 				this.sstats.AddErr()
 				this.cstats.AddErr()
 			} else if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
