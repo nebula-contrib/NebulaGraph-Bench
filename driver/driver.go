@@ -46,14 +46,14 @@ func connectGraph(cfg *util.BenchConfig, retry uint) (client *nebula.GraphClient
 		client, err = nebula.NewClient(cfg.GraphDaemons[0].String(), nebula.WithTimeout(0))
 		if err != nil {
 			time.Sleep(2)
+			log.Println("failed to create the nebula client, we will try again.", err.Error())
 			continue
 		} else if err = client.Connect(cfg.User, cfg.Pass); err != nil {
 			time.Sleep(2)
+			log.Println("failed to connect the nebula server, we will try again.", err.Error())
 			continue
 		} else if _, err := client.Execute("USE " + cfg.Space); err != nil {
-			time.Sleep(2)
 			client.Disconnect()
-			continue
 		}
 		break
 	}
