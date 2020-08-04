@@ -135,12 +135,12 @@ Loop:
 				log.Println(e)
 				this.clients[idx].Disconnect()
 				this.clients[idx], e = connectGraph(this.config, 4)
+				this.sstats.AddErr()
+				this.cstats.AddErr()
 				if e != nil {
 					log.Println(e)
 					break Loop
 				}
-				this.sstats.AddErr()
-				this.cstats.AddErr()
 			} else if resp.GetErrorCode() != graph.ErrorCode_SUCCEEDED {
 				log.Printf("Statement: %s, ErrorCode: %v, ErrorMsg: %s",
 					s, resp.GetErrorCode(), resp.GetErrorMsg())
