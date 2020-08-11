@@ -32,6 +32,8 @@ var flagBenchFile string
 var flagHttpPort int
 var cpuProfile string
 var outputDBOnce bool
+var latencySchemaFormat string = `CREATE TABLE IF NOT EXISTS %s(graph_version VARCHAR(200) DEFAULT '', meta_version VARCHAR(200) DEFAULT '',
+		storage_version VARCHAR(200) DEFAULT '', name VARCHAR(50) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, error BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
 
 func initFlags() {
 	flag.StringVar(&flagBenchFile, "bench-config", "", "Path to the configuration file for the local mode")
@@ -62,6 +64,13 @@ func startWithLocalMode() error {
 	}
 
 	fmt.Printf("bench-config: %v\n", config)
+
+	if config.MysqlDSN != "" {
+		if config.MysqlTableName == "" {
+			return fmt.Errorf("The mysql table name must be set.")
+		}
+		driver.LatencySchema = fmt.Sprintf(latencySchemaFormat, config.MysqlTableName)
+	}
 
 	if d, e := driver.NewDriver(config, outputDBOnce); e != nil {
 		return e
