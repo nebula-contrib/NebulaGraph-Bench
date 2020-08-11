@@ -17,10 +17,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-const (
-	latency_schema = `CREATE TABLE IF NOT EXISTS latency(graph_version VARCHAR(200) DEFAULT '', meta_version VARCHAR(200) DEFAULT '',
-		storage_version VARCHAR(200) DEFAULT '', name VARCHAR(50) DEFAULT '', type VARCHAR(50), timestamp DATETIME, samples BIGINT, error BIGINT, qps BIGINT, average double, p95 double,p99 double,p999 double, test BIGINT)`
-)
+var LatencySchema string
 
 type Driver struct {
 	counter      uint64
@@ -98,7 +95,7 @@ func NewDriver(cfg *util.BenchConfig, outputDBOnce bool) (*Driver, error) {
 		} else if e := db.Ping(); e != nil {
 			log.Println(e)
 			return nil, e
-		} else if res, e := db.Exec(latency_schema); e != nil {
+		} else if res, e := db.Exec(LatencySchema); e != nil {
 			log.Println(e)
 			return nil, e
 		} else {
@@ -109,8 +106,8 @@ func NewDriver(cfg *util.BenchConfig, outputDBOnce bool) (*Driver, error) {
 	}
 
 	driver.config = cfg
-	driver.sstats = util.NewStats("server-side", cfg.Name)
-	driver.cstats = util.NewStats("client-side", cfg.Name)
+	driver.sstats = util.NewStats("server-side", cfg.Name, cfg.MysqlTableName)
+	driver.cstats = util.NewStats("client-side", cfg.Name, cfg.MysqlTableName)
 	driver.outputDBOnce = outputDBOnce
 
 	return driver, nil

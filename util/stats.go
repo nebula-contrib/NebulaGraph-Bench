@@ -47,9 +47,13 @@ type Stats struct {
 	trends   []*Metric
 	lock     sync.Mutex
 	lastid   int64
+	sql      string
 }
 
-func NewStats(name string, testName string) *Stats {
+var sqlFormat string = `INSERT INTO %s(name, type, timestamp, samples, error, qps,average,p95,p99,p999,test) 
+	VALUES(?,?,NOW(),?,?,?,?,?,?,?,?)`
+
+func NewStats(name string, testName string, tableName string) *Stats {
 	stats := &Stats{}
 	stats.current = newHist()
 	stats.overall = newHist()
@@ -58,6 +62,7 @@ func NewStats(name string, testName string) *Stats {
 	stats.lastid = 0
 	stats.ticker = time.NewTicker(kInterval * time.Second)
 	stats.testName = testName
+	stats.sql = fmt.Sprintf(sqlFormat, tableName)
 	go stats.tick()
 	return stats
 }
@@ -246,8 +251,7 @@ func (this *Stats) OverallMetric() string {
 }
 
 func (this *Stats) writeDB(db *sql.DB, test_id int64, m *Metric) {
-	if _, e := db.Exec(`INSERT INTO latency(name, type, timestamp, samples, error, qps,average,p95,p99,p999,test) 
-		VALUES(?,?,NOW(),?,?,?,?,?,?,?,?)`, this.testName, this.name, m.samples, m.err, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
+	if _, e := db.Exec(this.sql, this.testName, this.name, m.samples, m.err, m.qps, m.avg, m.p95, m.p99, m.p999, test_id); e != nil {
 		log.Fatal(e)
 	}
 }

@@ -35,15 +35,16 @@ type WorkloadConfig struct {
 }
 
 type BenchConfig struct {
-	Name         string         `json:"test-name"`
-	GraphDaemons []Address      `json:"graph-daemons"`
-	User         string         `json:"user"`
-	Pass         string         `json:"pass"`
-	Space        string         `json:"space"`
-	Rate         int            `json:"rate"`
-	Concurrent   int            `json:"concurrent"`
-	Workload     WorkloadConfig `json:"workload"`
-	MysqlDSN     string         `json:"mysql-dsn"`
+	Name           string         `json:"test-name"`
+	GraphDaemons   []Address      `json:"graph-daemons"`
+	User           string         `json:"user"`
+	Pass           string         `json:"pass"`
+	Space          string         `json:"space"`
+	Rate           int            `json:"rate"`
+	Concurrent     int            `json:"concurrent"`
+	Workload       WorkloadConfig `json:"workload"`
+	MysqlDSN       string         `json:"mysql-dsn"`
+	MysqlTableName string         `json:"mysql-tablename"`
 }
 
 func (cfg *BenchConfig) ParseFromJson(content []byte) error {
