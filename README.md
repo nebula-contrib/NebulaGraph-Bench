@@ -19,8 +19,28 @@
        vid int    : ldbc/import/ldbc_vid_int.yaml
        vid string : ldbc/import/ldbc_vid_string.yaml
        must config info：
-     ` ` `
-      $ sudo apt-get install vim-gnome
-    ` ` `
+       version: v2
+description: ldbc
+removeTempFiles: false
+clientSettings:
+  retry: 3
+  concurrency: 30 # number of graph clients
+  channelBufferSize: 1
+  space: ldbc_snb_sf100_vid_string
+  connection:
+    user: root
+    password: nebula
+    address:
+  postStart:
+    commands: |
+      CREATE SPACE IF NOT EXISTS ldbc_snb_sf100_vid_string(PARTITION_NUM = 24, REPLICA_FACTOR = 1, vid_type = fixed_string(20));
+      USE ldbc_snb_sf100_vid_string;
+      CREATE TAG IF NOT EXISTS person(first_name string, last_name string, gender string, birthday string, ip string, browser string);
+      CREATE TAG IF NOT EXISTS place(name string, type string, url string);
+      CREATE TAG IF NOT EXISTS organization(name string, type string, url string);
+      CREATE TAG IF NOT EXISTS post(`time` string, image string, ip string, browser string, language string, content string, length int);
+      CREATE TAG IF NOT EXISTS comment(`time` string, ip string, browser st
+   
+       
      
    
