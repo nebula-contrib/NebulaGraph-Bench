@@ -16,14 +16,34 @@
 ###    download and make build importer
        git@github.com:vesoft-inc/nebula-importer.git
 ###    config ldbc configs:     
-       vid int    : ldbc/import/ldbc_vid_int.yaml
-       vid string : ldbc/import/ldbc_vid_string.yaml
-       must config info：
+         vid int    : ldbc/import/ldbc_vid_int.yaml
+         vid string : ldbc/import/ldbc_vid_string.yaml
+         must config info：
+         
+         clientSettings:
+           space: {ldbcspace}
+           address: {ip1:port,ip2:port}
+          
+         commands:  
+           CREATE SPACE IF NOT EXISTS {ldbcspace}(PARTITION_NUM = 24, REPLICA_FACTOR = 1, vid_type = fixed_string(20));
+           USE {ldbcspace};
        
-       space: ldbcspace
-       address: ip1:port,ip2:port
-       commands: 
-         CREATE SPACE IF NOT EXISTS ldbcspace(PARTITION_NUM = 24, REPLICA_FACTOR = 1, vid_type = fixed_string(20));
-         USE ldbcspace;
+         files: 
+           path:
+             - path: {path}/ldbc_snb_datagen/social_network/dynamic/person.csv
+             - path: {path}/ldbc_snb_datagen/social_network/static/place.csv
+             - path: {path}/ldbc_snb_datagen/social_network/static/organisation.csv
+             - path: {path}/ldbc_snb_datagen/social_network/dynamic/post.csv
+             - path: {path}/ldbc_snb_datagen/social_network/dynamic/comment.csv
+             - path: {path}/ldbc_snb_datagen/social_network/dynamic/forum.csv
+             - path: {path}/ldbc_snb_datagen/social_network/static/tag.csv
+             - path: {path}/ldbc_snb_datagen/social_network/static/tagclass.csv
+             ...
+           
+###     import ldbc data to ldbc:
+        ./nebula-importer --config  ldbc_vid_int.yaml
+  
+ #   perf test
        
+   
        
