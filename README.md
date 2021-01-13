@@ -75,6 +75,15 @@
          <stringProp name="Argument.name">nGQL</stringProp>
          <stringProp name="Argument.value">{GO 3 STEP FROM "replace" OVER knows}</stringProp>
     
+##     Nebula perf test nGQL
+       GO 1 STEP FROM replace OVER knows 
+       GO 1 STEP FROM replace OVER knows YIELD knows.`time`, $$.person.first_name, $$.person.last_name, $$.person.birthday
+       GO 2 STEP FROM replace OVER knows 
+       GO 2 STEP FROM replace OVER knows YIELD knows.`time`, $$.person.first_name, $$.person.last_name, $$.person.birthday
+       GO 3 STEP FROM replace OVER knows 
+       GO 3 STEP FROM replace OVER knows YIELD knows.`time`, $$.person.first_name, $$.person.last_name, $$.person.birthday
+
+
 ##    Run Jmeter
        cd apache-jmeter-5.4 
        perf test:
