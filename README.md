@@ -1,5 +1,6 @@
 # 1、Download nebula-bench 
-   git clone git@github.com:vesoft-inc/nebula-bench.git
+    
+       git@github.com:vesoft-inc/nebula-bench.git
  
 # 2、Download Jmeter
    cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
@@ -47,7 +48,8 @@
 ##    mvn package
       cd util/ldbc_go_step/ && mvn package
       
-##    put  jar  and to Jmeter 
+      
+##    put  jar and jmx file to Jmeter 
       ldbc_go_step-2-jar-with-dependencies.jar : put to  apache-jmeter-5.4/lib/ext
       nebula-bench/ldbc/jmx/go_step.jmx : put to apache-jmeter-5.4/
       config jmx: 
@@ -71,6 +73,13 @@
          
          <stringProp name="Argument.name">nGQL</stringProp>
          <stringProp name="Argument.value">{GO 3 STEP FROM "replace" OVER knows}</stringProp>
+    
+##     run Jmeter
+       cd apache-jmeter-5.4 
+       perf test:
+        ./bin/jmeter.sh -n -t go_step.jmx  -l go_step.jtl -j go_step.log
+       report
+        ./bin/jmeter.sh -g go_step.jtl  -o go_step
        
       
        
