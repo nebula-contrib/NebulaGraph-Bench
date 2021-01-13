@@ -19,8 +19,8 @@
        vid int    : ldbc/import/ldbc_vid_int.yaml
        vid string : ldbc/import/ldbc_vid_string.yaml
        must config info：
-       ‘’‘
-       1111
-       ’‘’
+     ` ` `
+      $ sudo apt-get install vim-gnome
+    ` ` `
      
    
