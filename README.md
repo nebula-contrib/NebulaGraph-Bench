@@ -1,13 +1,13 @@
 # 1、Download nebula-bench 
     
-       git@github.com:vesoft-inc/nebula-bench.git
+       https://github.com/vesoft-inc/nebula-bench.git
  
 # 2、Download Jmeter
-   cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
+     cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
   
 # 3、ldbc data prepare
 ##  A）use ldbc_snb_datagen to generate dataset
-       details in  https://github.com/ldbc/ldbc_snb_datagen
+        https://github.com/ldbc/ldbc_snb_datagen
    
 ##  B）merge files： 
        After datagen，go to data path ldbc_snb_datagen/social_network/dynamic  and ldbc_snb_datagen/social_network/static 
