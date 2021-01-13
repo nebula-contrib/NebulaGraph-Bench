@@ -13,14 +13,14 @@
        run ldbc/scripts/csv-merger.sh to merge distribute files 
 
 ##  c）use nebula-imorter to import data to nebula:
-      import tool:   git@github.com:vesoft-inc/nebula-importer.git
-      git clone and make build
-      ldbc config files in  ldbc/import:
-      vid int    : ldbc_vid_int.yaml
-      vid string :   ldbc_vid_string.yaml
-      must config info：
-      ‘’‘
-      1111
-      ’‘’
+###    download and make build importer
+       git@github.com:vesoft-inc/nebula-importer.git
+###    config ldbc configs:     
+       vid int    : ldbc/import/ldbc_vid_int.yaml
+       vid string : ldbc/import/ldbc_vid_string.yaml
+       must config info：
+       ‘’‘
+       1111
+       ’‘’
      
    
