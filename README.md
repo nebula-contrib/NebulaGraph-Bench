@@ -13,9 +13,10 @@
        After datagen，go to data path ldbc_snb_datagen/social_network/dynamic  and ldbc_snb_datagen/social_network/static 
        run ldbc/scripts/csv-merger.sh to merge distribute files 
 
-##  c）Use nebula-imorter to import data to nebula:
+##  C）Use nebula-imorter to import data to nebula:
 ###    Download and make build importer
        git@github.com:vesoft-inc/nebula-importer.git
+
 ###    Config ldbc configs:     
          vid int    : ldbc/import/ldbc_vid_int.yaml
          vid string : ldbc/import/ldbc_vid_string.yaml
@@ -44,7 +45,7 @@
 ###     Import ldbc data to ldbc:
         ./nebula-importer --config  ldbc_vid_int.yaml
  
-#   4、Perf test
+#  4、Perf test
 ##     Mvn package
        cd util/ldbc_go_step/ && mvn package
       
