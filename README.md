@@ -3,7 +3,7 @@
        https://github.com/vesoft-inc/nebula-bench.git
  
 # 2、Download Jmeter
-     cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
+       cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
   
 # 3、LDBC data prepare
 ##  A）Use ldbc_snb_datagen to generate dataset
@@ -15,7 +15,7 @@
 
 ##  C）Use nebula-imorter to import data to nebula:
 ###    Download and make build importer
-       git@github.com:vesoft-inc/nebula-importer.git
+         https://github.com/vesoft-inc/nebula-importer.git
 
 ###    Config ldbc configs:     
          vid int    : ldbc/import/ldbc_vid_int.yaml
@@ -75,7 +75,7 @@
          <stringProp name="Argument.name">nGQL</stringProp>
          <stringProp name="Argument.value">{GO 3 STEP FROM "replace" OVER knows}</stringProp>
     
-##     Run Jmeter
+##    Run Jmeter
        cd apache-jmeter-5.4 
        perf test:
         ./bin/jmeter.sh -n -t go_step.jmx  -l go_step.jtl -j go_step.log
