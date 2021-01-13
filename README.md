@@ -42,8 +42,39 @@
            
 ###     import ldbc data to ldbc:
         ./nebula-importer --config  ldbc_vid_int.yaml
-  
- #   perf test
+ 
+#   4、perf test
+##    mvn package
+      cd util/ldbc_go_step/ && mvn package
+      
+##    put  jar  and to Jmeter 
+      ldbc_go_step-2-jar-with-dependencies.jar : put to  apache-jmeter-5.4/lib/ext
+      nebula-bench/ldbc/jmx/go_step.jmx : put to apache-jmeter-5.4/
+      config jmx: 
+         <stringProp name="LoopController.loops">{loops}</stringProp> 
+         <stringProp name="ThreadGroup.num_threads">{nums}</stringProp> 
+        
+         <stringProp name="Argument.name">hosts</stringProp>
+         <stringProp name="Argument.value">{ip1:port,ip2:port,ip3:port}</stringProp>
+         
+         <stringProp name="Argument.name">maxconn</stringProp>
+         <stringProp name="Argument.value">{max}</stringProp>
+        
+         <stringProp name="Argument.name">user</stringProp>
+         <stringProp name="Argument.value">{user}</stringProp>
+              
+         <stringProp name="Argument.name">pwd</stringProp>
+         <stringProp name="Argument.value">{pwd}</stringProp>
+               
+         <stringProp name="Argument.name">space</stringProp>
+         <stringProp name="Argument.value">{spacename}</stringProp>
+         
+         <stringProp name="Argument.name">nGQL</stringProp>
+         <stringProp name="Argument.value">{GO 3 STEP FROM "replace" OVER knows}</stringProp>
+       
+      
+       
+
        
    
        
