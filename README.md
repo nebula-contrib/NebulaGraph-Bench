@@ -5,18 +5,18 @@
 # 2、Download Jmeter
      cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
   
-# 3、ldbc data prepare
-##  A）use ldbc_snb_datagen to generate dataset
+# 3、LDBC data prepare
+##  A）Use ldbc_snb_datagen to generate dataset
         https://github.com/ldbc/ldbc_snb_datagen
    
-##  B）merge files： 
+##  B）Merge files： 
        After datagen，go to data path ldbc_snb_datagen/social_network/dynamic  and ldbc_snb_datagen/social_network/static 
        run ldbc/scripts/csv-merger.sh to merge distribute files 
 
-##  c）use nebula-imorter to import data to nebula:
-###    download and make build importer
+##  c）Use nebula-imorter to import data to nebula:
+###    Download and make build importer
        git@github.com:vesoft-inc/nebula-importer.git
-###    config ldbc configs:     
+###    Config ldbc configs:     
          vid int    : ldbc/import/ldbc_vid_int.yaml
          vid string : ldbc/import/ldbc_vid_string.yaml
          must config info：
@@ -41,18 +41,18 @@
              - path: {path}/ldbc_snb_datagen/social_network/static/tagclass.csv
              ...
            
-###     import ldbc data to ldbc:
+###     Import ldbc data to ldbc:
         ./nebula-importer --config  ldbc_vid_int.yaml
  
-#   4、perf test
-##    mvn package
-      cd util/ldbc_go_step/ && mvn package
+#   4、Perf test
+##     Mvn package
+       cd util/ldbc_go_step/ && mvn package
       
       
-##    put  jar and jmx file to Jmeter 
-      ldbc_go_step-2-jar-with-dependencies.jar : put to  apache-jmeter-5.4/lib/ext
-      nebula-bench/ldbc/jmx/go_step.jmx : put to apache-jmeter-5.4/
-      config jmx: 
+##     Put  jar and jmx file to Jmeter 
+       ldbc_go_step-2-jar-with-dependencies.jar : put to  apache-jmeter-5.4/lib/ext
+       nebula-bench/ldbc/jmx/go_step.jmx : put to apache-jmeter-5.4/
+       config jmx: 
          <stringProp name="LoopController.loops">{loops}</stringProp> 
          <stringProp name="ThreadGroup.num_threads">{nums}</stringProp> 
         
@@ -60,7 +60,7 @@
          <stringProp name="Argument.value">{ip1:port,ip2:port,ip3:port}</stringProp>
          
          <stringProp name="Argument.name">maxconn</stringProp>
-         <stringProp name="Argument.value">{max}</stringProp>
+         <stringProp name="Argument.value">{max}</stringProp>  //  >= ThreadGroup.num_threads
         
          <stringProp name="Argument.name">user</stringProp>
          <stringProp name="Argument.value">{user}</stringProp>
@@ -74,7 +74,7 @@
          <stringProp name="Argument.name">nGQL</stringProp>
          <stringProp name="Argument.value">{GO 3 STEP FROM "replace" OVER knows}</stringProp>
     
-##     run Jmeter
+##     Run Jmeter
        cd apache-jmeter-5.4 
        perf test:
         ./bin/jmeter.sh -n -t go_step.jmx  -l go_step.jtl -j go_step.log
