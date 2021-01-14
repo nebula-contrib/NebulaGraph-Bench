@@ -129,7 +129,7 @@ public class ldbc_go_step implements JavaSamplerClient
 
         if (!resp.isSucceeded()) {
             result.setSuccessful(false);
-	        result.setResponseMessage(nGQL+":"+resp.getErrorMessage());
+	    result.setResponseMessage(nGQL+":"+resp.getErrorMessage());
             log.error(String.format("Execute: `%s', failed: %s",
                 nGQL, resp.getErrorMessage()));
 	}
