@@ -63,10 +63,8 @@
                     <!-- 配置执行器 -->
                     <execution>
                         <id>make-assembly</id>
-                        <!-- 绑定到package命令的生命周期上 -->
                         <phase>package</phase>
                         <goals>
-                            <!-- 只运行一次 -->
                             <goal>single</goal>
                         </goals>
                     </execution>
