@@ -124,7 +124,7 @@ public class LdbcGoStep implements JavaSamplerClient {
 
     @Override
     public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-        System.out.print("Perf runTest:" + Thread.currentThread().getName() + "\n");
+        System.out.println("Perf runTest:" + Thread.currentThread().getName());
 
         SampleResult result = new SampleResult();
         result.setSampleLabel("Java request");
