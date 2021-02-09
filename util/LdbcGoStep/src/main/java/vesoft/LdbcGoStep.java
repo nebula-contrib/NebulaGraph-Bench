@@ -98,7 +98,6 @@ public class LdbcGoStep implements JavaSamplerClient {
         initNebulaPool(hosts, maxconn, id);
         try {
             session = pool.getSession(user, pwd, false);
-            assert session != null;
             if (session != null) {
                 String use_space = "use " + space + ";";
                 ResultSet resp = null;
