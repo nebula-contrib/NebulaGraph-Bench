@@ -3,7 +3,7 @@
        https://github.com/vesoft-inc/nebula-bench.git
  
 # 2、Download Jmeter
-       cd nebula-bench &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
+        mkdir {testdir} && cd {testdir} &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
   
 # 3、LDBC data prepare
 ##  A）Use ldbc_snb_datagen to generate dataset

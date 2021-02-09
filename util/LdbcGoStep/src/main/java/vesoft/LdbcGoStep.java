@@ -1,3 +1,9 @@
+/* Copyright (c) 2021 vesoft inc. All rights reserved.
+ *
+ * This source code is licensed under Apache 2.0 License,
+ * attached with Common Clause Condition 1.0, found in the LICENSES directory.
+ */
+
 package com.vesoft;
 
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
@@ -6,11 +12,13 @@ import com.vesoft.nebula.client.graph.data.ResultSet;
 import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.jmeter.config.Arguments;
@@ -33,7 +41,7 @@ public class LdbcGoStep implements JavaSamplerClient {
     @Override
     public Arguments getDefaultParameters() {
         Arguments arguments = new Arguments();
-        arguments.addArgument("hosts", "127.0.0.1:3699");
+        arguments.addArgument("hosts", "127.0.0.1:9669");
         arguments.addArgument("maxconn", "10");
         arguments.addArgument("user", "root");
         arguments.addArgument("pwd", "nebula");
@@ -46,7 +54,6 @@ public class LdbcGoStep implements JavaSamplerClient {
 
     public void initNebulaPool(String hosts, int maxconn, int id) {
         pool = new NebulaPool();
-        assert pool != null;
         try {
             List<HostAddress> addresses = new ArrayList();
             NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
@@ -57,16 +64,30 @@ public class LdbcGoStep implements JavaSamplerClient {
             String[] splits = host.split(":");
             addresses.add(new HostAddress(splits[0], Integer.parseInt(splits[1])));
             boolean init = pool.init(addresses, nebulaPoolConfig);
-            assert init == true;
+            if (init != true) {
+                if (pool != null) {
+                    pool.close();
+                }
+                System.out.println("pool init failed!");
+                System.exit(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            if (pool != null) {
+                pool.close();
+            }
+            System.out.println("pool init failed!");
+            System.exit(1);
+
+        } finally {
+            log.info(String.format("initNebulaPool success!"));
         }
     }
 
 
     @Override
     public void setupTest(JavaSamplerContext javaSamplerContext) {
-        System.out.print("Perf thread start:" + Thread.currentThread().getName() + "\n");
+        System.out.println("Perf thread start:" + Thread.currentThread().getName());
         String hosts = javaSamplerContext.getParameter("hosts");
         int maxconn = Integer.parseInt(javaSamplerContext.getParameter("maxconn").trim());
         String user = javaSamplerContext.getParameter("user");
@@ -78,12 +99,26 @@ public class LdbcGoStep implements JavaSamplerClient {
         try {
             session = pool.getSession(user, pwd, false);
             assert session != null;
-            String use_space = "use " + space + ";";
-            ResultSet resp = null;
-            resp = session.execute(use_space);
-            assert resp.isSucceeded();
+            if (session != null) {
+                String use_space = "use " + space + ";";
+                ResultSet resp = null;
+                resp = session.execute(use_space);
+            } else {
+                System.out.println("getSession failed !");
+                pool.close();
+                System.exit(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            if (session != null) {
+                session.release();
+            }
+            if (pool != null) {
+                pool.close();
+            }
+            System.exit(1);
+        } finally {
+            log.info(String.format("setupTest success!"));
         }
     }
 
@@ -129,15 +164,12 @@ public class LdbcGoStep implements JavaSamplerClient {
 
     @Override
     public void teardownTest(JavaSamplerContext javaSamplerContext) {
-        System.out.print("Pert test end!\n");
-        assert session != null;
-        session.release();
+        System.out.println("Pert test end!");
+        if (session != null) {
+            session.release();
+        }
         if (pool.getActiveConnNum() == 0) {
             pool.close();
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
     }
 }
