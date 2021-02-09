@@ -60,7 +60,6 @@
                     </archive>
                 </configuration>
                 <executions>
-                    <!-- 配置执行器 -->
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
