@@ -47,11 +47,11 @@
  
 #  4、Perf test
 ##     Mvn package
-       cd util/ldbc_go_step/ && mvn package
+       cd util/LdbcGoStep/ && mvn package
       
       
 ##     Put  jar and jmx file to Jmeter 
-       ldbc_go_step-2-jar-with-dependencies.jar : put to  apache-jmeter-5.4/lib/ext
+       LdbcGoStep-2-jar-with-dependencies.jar: put to  apache-jmeter-5.4/lib/ext
        nebula-bench/ldbc/jmx/go_step.jmx : put to apache-jmeter-5.4/
        config jmx: 
          <stringProp name="LoopController.loops">{loops}</stringProp> 
@@ -61,7 +61,7 @@
          <stringProp name="Argument.value">{ip1:port,ip2:port,ip3:port}</stringProp>
          
          <stringProp name="Argument.name">maxconn</stringProp>
-         <stringProp name="Argument.value">{max}</stringProp>  //  >= ThreadGroup.num_threads
+         <stringProp name="Argument.value">{max}</stringProp>  //  >= 1
         
          <stringProp name="Argument.name">user</stringProp>
          <stringProp name="Argument.value">{user}</stringProp>

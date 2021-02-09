@@ -16,9 +16,9 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">900</stringProp>
+          <stringProp name="LoopController.loops">10</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">300</stringProp>
+        <stringProp name="ThreadGroup.num_threads">10</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
@@ -36,7 +36,7 @@
 	</elementProp>
  <elementProp name="maxconn" elementType="Argument">
                 <stringProp name="Argument.name">maxconn</stringProp>
-                <stringProp name="Argument.value">1000</stringProp>
+                <stringProp name="Argument.value">10</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
 	</elementProp>
  <elementProp name="user" elementType="Argument">
@@ -68,7 +68,7 @@
       </collectionProp>
 
           </elementProp>
-          <stringProp name="classname">com.vesoft.ldbc_go_step</stringProp>
+          <stringProp name="classname">com.vesoft.LdbcGoStep</stringProp>
         </JavaSampler>
         <hashTree>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
