@@ -25,7 +25,6 @@ import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.assertions.AssertionResult;
 
 
@@ -46,7 +45,7 @@ public class LdbcGoStep implements JavaSamplerClient {
         arguments.addArgument("user", "root");
         arguments.addArgument("pwd", "nebula");
         arguments.addArgument("space", "");
-        arguments.addArgument("nGQL", "");
+        arguments.addArgument("nGQL", "yield 1");
         arguments.addArgument("person", "");
         return arguments;
     }
@@ -59,7 +58,11 @@ public class LdbcGoStep implements JavaSamplerClient {
             NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
             nebulaPoolConfig.setMaxConnSize(maxconn);
             List<String> host_list = new ArrayList<String>(Arrays.asList(hosts.split(",")));
-            assert host_list != null;
+	    if (host_list == null){
+                System.out.println("host_list is null!");
+                System.exit(1);
+	    }
+
             String host = host_list.get(id%host_list.size());
             String[] splits = host.split(":");
             addresses.add(new HostAddress(splits[0], Integer.parseInt(splits[1])));
@@ -93,7 +96,6 @@ public class LdbcGoStep implements JavaSamplerClient {
         String user = javaSamplerContext.getParameter("user");
         String pwd = javaSamplerContext.getParameter("pwd");
         String space = javaSamplerContext.getParameter("space");
-        assert space != null;
         int id = javaSamplerContext.getJMeterContext().getThreadNum();
         initNebulaPool(hosts, maxconn, id);
         try {
@@ -124,35 +126,34 @@ public class LdbcGoStep implements JavaSamplerClient {
 
     @Override
     public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-        System.out.println("Perf runTest:" + Thread.currentThread().getName());
-
         SampleResult result = new SampleResult();
         result.setSampleLabel("Java request");
         String person = javaSamplerContext.getParameter("person");
         String nGQL = javaSamplerContext.getParameter("nGQL");
         nGQL = nGQL.replace("replace", person);
-        assert person != "";
-        assert nGQL != "";
         ResultSet resp = null;
-
+        result.setSampleLabel("Java request");
         result.sampleStart();
         try {
             resp = session.execute(nGQL);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assert resp != null;
         result.sampleEnd();
+	long latency = resp.getLatency();
+        result.setLatency(latency);
         result.setResponseData("Perf test::", "UTF-8");
         result.setDataEncoding("UTF-8");
 
         if (!resp.isSucceeded()) {
             result.setSuccessful(false);
+	    result.setResponseCode("-1");
             result.setResponseMessage(nGQL + ":" + resp.getErrorMessage());
             log.error(String.format("Execute: `%s', failed: %s",
                     nGQL, resp.getErrorMessage()));
         } else {
             result.setResponseMessage(nGQL);
+	    result.setResponseCodeOK();
             log.info(String.format("Execute: `%s', success!",
                     nGQL));
             result.setSuccessful(true);

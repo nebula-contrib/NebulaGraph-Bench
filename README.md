@@ -2,9 +2,11 @@
     
        https://github.com/vesoft-inc/nebula-bench.git
  
-# 2、Download Jmeter
-        mkdir {testdir} && cd {testdir} &&  wget https://mirror.bit.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip  &&  unzip apache-jmeter-5.4.zip 
-  
+# 2、Download Jmeter and install python pkg
+        cd  nebula-bench/ldbc/setup/
+        sh setup.sh {testdir}
+        Notes:jmeter url may be outdated, you can go https://jmeter.apache.org/download_jmeter.cgi find jmeter.zip's url, and change it in setup.sh 
+ 
 # 3、LDBC data prepare
 ##  A）Use ldbc_snb_datagen to generate dataset
         https://github.com/ldbc/ldbc_snb_datagen
@@ -88,10 +90,10 @@
        cd apache-jmeter-5.4 
        perf test:
         ./bin/jmeter.sh -n -t go_step.jmx  -l go_step.jtl -j go_step.log
-       report
+       report(jmeter):
         ./bin/jmeter.sh -g go_step.jtl  -o go_step
-       
-      
+       report(statictis):
+        python3 ldbc/scripts/statistics.py go_step.jtl     
        
 
        
