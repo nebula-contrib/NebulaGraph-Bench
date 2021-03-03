@@ -10,7 +10,6 @@ else
     echo "jmeter install path is $1"
 fi
 
-
 cd ${java_prj_path}
 mvn package
 if [ $? != 0 ] ; then
@@ -19,9 +18,8 @@ if [ $? != 0 ] ; then
 else
     cd -
     echo "mvn package failed!"
+    exit
 fi
-
-
 
 wget -P $path https://mirrors.bfsu.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip
 unzip $path/apache-jmeter-5.4.zip  -d $path/
