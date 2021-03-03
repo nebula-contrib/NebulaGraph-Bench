@@ -1,10 +1,9 @@
 # 1、Download nebula-bench 
-    
-       https://github.com/vesoft-inc/nebula-bench.git
+        https://github.com/vesoft-inc/nebula-bench.git
  
-# 2、Download Jmeter and install python pkg
+# 2、 Mvn package  Download Jmeter and install python pkg
         cd  nebula-bench/ldbc/setup/
-        sh setup.sh {testdir}
+        sh setup.sh {testdir}  //for example: sh setup.sh /home/perftest 
         Notes:jmeter url may be outdated, you can go https://jmeter.apache.org/download_jmeter.cgi find jmeter.zip's url, and change it in setup.sh 
  
 # 3、LDBC data prepare
@@ -48,13 +47,9 @@
         ./nebula-importer --config  ldbc_vid_int.yaml
  
 #  4、Perf test
-##     Mvn package
-       cd util/LdbcGoStep/ && mvn package
-      
-      
-##     Put  jar and jmx file to Jmeter 
-       LdbcGoStep-2-jar-with-dependencies.jar: put to  apache-jmeter-5.4/lib/ext
-       nebula-bench/ldbc/jmx/go_step.jmx : put to apache-jmeter-5.4/
+##     Config jmx file 
+       path:
+         nebula-bench/ldbc/jmx/go_step.jmx
        config jmx: 
          <stringProp name="LoopController.loops">{loops}</stringProp> 
          <stringProp name="ThreadGroup.num_threads">{nums}</stringProp> 
@@ -87,14 +82,7 @@
 
 
 ##    Run Jmeter
-       cd apache-jmeter-5.4 
-       perf test:
-        ./bin/jmeter.sh -n -t go_step.jmx  -l go_step.jtl -j go_step.log
-       report(jmeter):
-        ./bin/jmeter.sh -g go_step.jtl  -o go_step
-       report(statictis):
-        python3 ldbc/scripts/statistics.py go_step.jtl     
-       
+         run.sh {jmeterdir}  //for example: sh run.sh /home/perftest/apache-jmeter-5.4 
 
        
    
