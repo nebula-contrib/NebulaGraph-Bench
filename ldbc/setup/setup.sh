@@ -14,12 +14,11 @@ cd ${java_prj_path}
 mvn package
 if [ $? != 0 ] ; then
     cd -
-    echo "mvn package sucess!"
-else
-    cd -
     echo "mvn package failed!"
     exit
 fi
+ 
+cd -
 
 wget -P $path https://mirrors.bfsu.edu.cn/apache//jmeter/binaries/apache-jmeter-5.4.zip
 unzip $path/apache-jmeter-5.4.zip  -d $path/
