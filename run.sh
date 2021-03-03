@@ -1,4 +1,4 @@
-#!bin/bash
+#! /usr/bin/env bash
 
 curr_path=$(readlink -f "$(dirname "$0")")
 java_prj_path=${curr_path}/util/LdbcGoStep
