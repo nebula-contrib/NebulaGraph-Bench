@@ -58,12 +58,12 @@ public class LdbcGoStep implements JavaSamplerClient {
             NebulaPoolConfig nebulaPoolConfig = new NebulaPoolConfig();
             nebulaPoolConfig.setMaxConnSize(maxconn);
             List<String> host_list = new ArrayList<String>(Arrays.asList(hosts.split(",")));
-	    if (host_list == null){
+            if (host_list == null) {
                 System.out.println("host_list is null!");
                 System.exit(1);
-	    }
+            }
 
-            String host = host_list.get(id%host_list.size());
+            String host = host_list.get(id % host_list.size());
             String[] splits = host.split(":");
             addresses.add(new HostAddress(splits[0], Integer.parseInt(splits[1])));
             boolean init = pool.init(addresses, nebulaPoolConfig);
@@ -140,20 +140,20 @@ public class LdbcGoStep implements JavaSamplerClient {
             e.printStackTrace();
         }
         result.sampleEnd();
-	long latency = resp.getLatency();
+        long latency = resp.getLatency();
         result.setLatency(latency);
         result.setResponseData("Perf test::", "UTF-8");
         result.setDataEncoding("UTF-8");
 
         if (!resp.isSucceeded()) {
             result.setSuccessful(false);
-	    result.setResponseCode("-1");
+            result.setResponseCode("-1");
             result.setResponseMessage(nGQL + ":" + resp.getErrorMessage());
             log.error(String.format("Execute: `%s', failed: %s",
                     nGQL, resp.getErrorMessage()));
         } else {
             result.setResponseMessage(nGQL);
-	    result.setResponseCodeOK();
+            result.setResponseCodeOK();
             log.info(String.format("Execute: `%s', success!",
                     nGQL));
             result.setSuccessful(true);
