@@ -84,7 +84,7 @@
 
 
 ##    Run Jmeter
-         sh run.sh {jmeterdir}  //for example: sh run.sh /home/perftest/apache-jmeter-5.4 
+        sh run.sh {jmeterdir}  //for example: sh run.sh /home/perftest/apache-jmeter-5.4 
 
        
    
