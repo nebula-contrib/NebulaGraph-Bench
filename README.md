@@ -1,10 +1,12 @@
+
 # 1、Download nebula-bench 
         https://github.com/vesoft-inc/nebula-bench.git
- 
+        Notes: This only supports nebula 2.0 version, if you want to test nebula 1.0 version, please download branch v1.0 of https://github.com/vesoft-inc/nebula-bench.git
+   
 # 2、 Mvn package  Download Jmeter and install python pkg
         cd  nebula-bench/ldbc/setup/
         sh setup.sh {testdir}  //for example: sh setup.sh /home/perftest 
-        Notes:jmeter url may be outdated, you can go https://jmeter.apache.org/download_jmeter.cgi find jmeter.zip's url, and change it in setup.sh 
+        Notes: Jmeter's url may be outdated, you can go https://jmeter.apache.org/download_jmeter.cgi to find jmeter.zip's url, and change it in setup.sh 
  
 # 3、LDBC data prepare
 ##  A）Use ldbc_snb_datagen to generate dataset
