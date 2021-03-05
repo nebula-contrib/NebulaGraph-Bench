@@ -5,7 +5,7 @@
    
 # 2、 Mvn package  Download Jmeter and install python pkg
         cd  nebula-bench/ldbc/setup/
-        sh setup.sh {testdir}  //for example: sh setup.sh /home/perftest 
+        sh setup.sh {jmeter_install_dir}  //for example: sh setup.sh /home/perf 
         Notes: Jmeter's url may be outdated, you can go https://jmeter.apache.org/download_jmeter.cgi to find jmeter.zip's url, and change it in setup.sh 
  
 # 3、LDBC data prepare
@@ -84,7 +84,7 @@
 
 
 ##    Run Jmeter
-        sh run.sh {jmeterdir}  //for example: sh run.sh /home/perftest/apache-jmeter-5.4 
+        sh run.sh {jmeterdir} {testdir}  //for example: sh run.sh /home/perf/apache-jmeter-5.4 /home/perf/test 
 
        
    
