@@ -14,12 +14,11 @@ do
         mv ${files[0]} $prefix.csv
         continue
     fi
-    lines=$(($(wc -l ${files[@]} | tail -1 | awk '{print $1}') - ${nr_files} + 1))
+    lines=$(($(wc -l ${files[@]} | tail -1 | awk '{print $1}') - ${nr_files}))
     echo "Files to merge:"
     printf "%s\n" "${files[@]}"
     echo "Expected # of lines: $lines"
 
-    head -1 ${files[0]} > $prefix.csv
     for f in ${files[@]}
     do
         tail -n+2 $f >> $prefix.csv
