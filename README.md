@@ -53,7 +53,7 @@
        path:
          nebula-bench/ldbc/jmx/go_step.jmx
        config jmx: 
-         <stringProp name="ThreadGroup.duration">60</stringProp>  // perftest duration time
+         <stringProp name="ThreadGroup.duration">{duration}</stringProp>  // perftest duration time(unit:s)
         
          <stringProp name="Argument.name">hosts</stringProp>
          <stringProp name="Argument.value">{ip1:port,ip2:port,ip3:port}</stringProp>
