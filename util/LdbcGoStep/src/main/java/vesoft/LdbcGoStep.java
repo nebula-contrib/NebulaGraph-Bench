@@ -104,12 +104,17 @@ public class LdbcGoStep implements JavaSamplerClient {
                 String use_space = "use " + space + ";";
                 ResultSet resp = null;
                 resp = session.execute(use_space);
+                if (!resp.isSucceeded()) {
+                    System.out.println("Switch space failed:" + space);
+                    System.exit(1);
+                }
             } else {
                 System.out.println("getSession failed !");
                 pool.close();
                 System.exit(1);
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
             if (session != null) {
                 session.release();
@@ -121,27 +126,30 @@ public class LdbcGoStep implements JavaSamplerClient {
         } finally {
             log.info(String.format("setupTest success!"));
         }
-    }
 
+    }
 
     @Override
     public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-        SampleResult result = new SampleResult();
-        result.setSampleLabel("Java request");
         String person = javaSamplerContext.getParameter("person");
         String nGQL = javaSamplerContext.getParameter("nGQL");
         nGQL = nGQL.replace("replace", person);
         ResultSet resp = null;
-        result.setSampleLabel("Java request");
-        result.sampleStart();
+        long stamp = System.currentTimeMillis();
+        long startTime = System.nanoTime();
+
         try {
             resp = session.execute(nGQL);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        result.sampleEnd();
-        long latency = resp.getLatency();
-        result.setLatency(latency);
+
+        long endTime = System.nanoTime();
+        long ClientLatency = (endTime - startTime) / 1000;
+        SampleResult result = new SampleResult(stamp, ClientLatency);
+        result.setSampleLabel("Java request");
+        long ServerLatency = resp.getLatency();
+        result.setLatency(ServerLatency);
         result.setResponseData("Perf test::", "UTF-8");
         result.setDataEncoding("UTF-8");
 
@@ -154,8 +162,6 @@ public class LdbcGoStep implements JavaSamplerClient {
         } else {
             result.setResponseMessage(nGQL);
             result.setResponseCodeOK();
-            log.info(String.format("Execute: `%s', success!",
-                    nGQL));
             result.setSuccessful(true);
         }
         return result;
