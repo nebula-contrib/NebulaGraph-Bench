@@ -52,7 +52,8 @@
 ##     Config jmx file 
        path:
          nebula-bench/ldbc/jmx/go_step.jmx
-       config jmx: 
+       config jmx:
+         <stringProp name="ThreadGroup.num_threads">{nums}</stringProp>   // concurrency 
          <stringProp name="ThreadGroup.duration">{duration}</stringProp>  // perftest duration time(unit:s)
         
          <stringProp name="Argument.name">hosts</stringProp>
