@@ -52,9 +52,9 @@
 ##     Config jmx file 
        path:
          nebula-bench/ldbc/jmx/go_step.jmx
-       config jmx: 
-         <stringProp name="LoopController.loops">{loops}</stringProp> 
-         <stringProp name="ThreadGroup.num_threads">{nums}</stringProp> 
+       config jmx:
+         <stringProp name="ThreadGroup.num_threads">{nums}</stringProp>   // concurrency 
+         <stringProp name="ThreadGroup.duration">{duration}</stringProp>  // perftest duration time(unit:s)
         
          <stringProp name="Argument.name">hosts</stringProp>
          <stringProp name="Argument.value">{ip1:port,ip2:port,ip3:port}</stringProp>
@@ -84,8 +84,12 @@
 
 
 ##    Run Jmeter
-        sh run.sh {jmeterdir} {testdir}  //for example: sh run.sh /home/perf/apache-jmeter-5.4 /home/perf/test 
+        A: run perftest and store perf metrics in file
+        sh run.sh -j {jmeterdir} -t {testdir}  //for example: sh run.sh -j /home/perf/apache-jmeter-5.4 -t /home/perf/test 
 
+        B: run perftest and store perf metrics in file and store perf metrics in mysql
+         //Notes: use ldbc/sql/perf_metric.sql to create db and table in mysql 
+         sh run_3.sh -m {mysqconf} -v {nebula_version} -c {casename} -j {jmeterdir} -t {testdir} //sh run_3.sh -m  '{"ip":"127.0.0.1","port":3306,"user":"xxx","pwd":"xxx","db":"perftest"}' -v 2.0 -c case1 -j jmeter/apache-jmeter-5.4 -t test
        
    
        

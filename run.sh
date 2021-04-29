@@ -1,22 +1,55 @@
 #! /usr/bin/env bash
 curr_path=$(readlink -f "$(dirname "$0")")
 
+casename=""
+version=""
+jmeter_path=""
+test_path=""
 
-if [ $# -lt 1 ] ; then
-    echo "Please input jmeter_path and test path(default is jmeter_path/..)"
-    exit
-elif [ $# -eq 1 ] ; then
-    jmeter_path=$1
+
+while getopts m:c:v:j:t: opt;
+do
+    case $opt in
+        m)   mysqlconf=$OPTARG
+             ;;
+        c)
+             casename=$OPTARG
+             ;;
+        v)
+             version=$OPTARG
+             ;;
+        j)  
+             jmeter_path=$OPTARG
+             ;;
+        t)
+             test_path=$OPTARG
+             ;;
+    esac
+done
+
+if [[ -z $jmeter_path ]] ; then
+    echo "Please input jmeter_path"
+    exit -1
+fi
+
+if [[ -z $test_path ]] ; then
     datetime=`date +%Y%m%d_%H%M%S_%N |cut -b1-20`
     test_path=${jmeter_path}/../${datetime}
-    echo "jmeter_path is $jmeter_path"
-    echo "test_path is $test_path"
 else
-    jmeter_path=$1
     datetime=`date +%Y%m%d_%H%M%S_%N |cut -b1-20`
-    test_path=$2/${datetime}
-    echo "jmeter path is $jmeter_path"
-    echo "test path is $test_path"
+    test_path=${test_path}/${datetime}    
+fi
+
+if [ $mysqlconf ] ; then
+    if [[ -z $casename ]] ; then
+        echo "Please input casename"
+        exit -1
+    fi
+
+    if [[ -z $version ]] ; then
+        echo "Please input nebula version"
+        exit -1
+    fi
 fi
 
 jmx_path=${curr_path}/ldbc/jmx/go_step.jmx
@@ -29,30 +62,27 @@ if [ $? != 0 ] ; then
 fi
 
 perftest_cmd1="${jmeter_path}/bin/jmeter.sh -n -t ${test_path}/go_step.jmx -l ${test_path}/go_step.jtl -j ${test_path}/go_step.log  -d ${jmeter_path}"
-perftest_cmd2="${jmeter_path}/bin/jmeter.sh -g ${test_path}/go_step.jtl -o ${test_path}/go_step -j ${test_path}/go_step.log  -d ${jmeter_path}"
-perftest_cmd3="python3 ${curr_path}/ldbc/scripts/statistics.py ${test_path}/go_step.jtl"
+
+if [[ -z $mysqlconf ]] ; then
+    perftest_cmd2="python3 ${curr_path}/ldbc/scripts/statistics.py -f ${test_path}/go_step.jtl"
+else
+    perftest_cmd2="python3 ${curr_path}/ldbc/scripts/statistics.py -f ${test_path}/go_step.jtl  -m ${mysqlconf} -c ${casename} -v ${version}"
+fi
+
 
 $perftest_cmd1
 if [ $? != 0 ] ; then
     echo "$perftest_cmd1 failed!"
-    exit
+    exit -1
 fi
 
 
-$perftest_cmd2
+$perftest_cmd2  |  tee  ${test_path}/go_step.statistics
 
 if [ $? != 0 ] ; then
 
     echo "$perftest_cmd2 failed!"
-    exit
-fi
-
-$perftest_cmd3   |  tee  ${test_path}/go_step.statistics
-
-if [ $? != 0 ] ; then
-
-    echo "$perftest_cmd3 failed!"
-    exit
+    exit -1
 fi
 
 
