@@ -3,7 +3,7 @@ import click
 
 from nebula_bench import setting
 from nebula_bench.utils import logger
-from nebula_bench.controller import StressController, QueryController, NebulaController
+from nebula_bench.controller import NebulaController
 from nebula_bench.utils import run_process
 
 

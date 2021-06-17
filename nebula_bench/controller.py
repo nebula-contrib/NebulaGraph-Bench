@@ -217,7 +217,7 @@ class QueryController(BaseController):
     def __init__(
         self,
         alert_class=None,
-        report_class=QueryReporter,
+        report_class=None,
         space=None,
         user=None,
         password=None,
@@ -301,4 +301,5 @@ class QueryController(BaseController):
         pass
 
     def generate_report(self):
-        return self.report_class(self).report()
+        if self.report_class is not None:
+            return self.report_class(self).report()
