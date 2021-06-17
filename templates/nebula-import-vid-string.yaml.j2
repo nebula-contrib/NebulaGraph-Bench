@@ -1,0 +1,95 @@
+version: v2
+description: ldbc
+removeTempFiles: false
+clientSettings:
+  retry: 3
+  concurrency: 30 # number of graph clients
+  channelBufferSize: 128
+  space: {{ space }}
+  connection:
+    user: {{ user }}
+    password: {{ password }}
+    address: {{ address }}
+  postStart:
+    commands: |
+      UPDATE CONFIGS heartbeat_interval_secs=1;
+      CREATE SPACE IF NOT EXISTS {{ space }}(PARTITION_NUM = 24, REPLICA_FACTOR = 3, vid_type = fixed_string(20));
+      USE {{ space }};
+      {% for vertex in vertex_set -%}
+          CREATE TAG IF NOT EXISTS `{{ vertex.name }}`(
+          {%- for prop in vertex.prop_list -%}
+            `{{ prop.name }}` {{ prop.type }}
+             {%- if not loop.last -%}
+                {{','}}
+             {%- endif -%}
+          {%- endfor -%}
+          );
+      {% endfor -%}
+
+      {% for edge in edge_set -%}
+          CREATE EDGE IF NOT EXISTS `{{ edge.name }}`(
+          {%- for prop in edge.prop_list -%}
+            `{{ prop.name }}` {{ prop.type }}
+             {%- if not loop.last -%}
+                {{','}}
+             {%- endif -%}
+          {%- endfor -%}
+          );
+      {% endfor %}
+
+    afterPeriod: 8s
+logPath: ./err/test.log
+files:
+{%- for vertex in vertex_list: %}
+  - path: {{ vertex.path }}
+    failDataPath: ./err/data/{{ vertex.name}}.csv
+    batchSize: 100
+    type: csv
+    csv:
+      withHeader: false
+      withLabel: false
+      delimiter: "|"
+    schema:
+      type: vertex
+      vertex:
+        vid:
+          index: {{ vertex.index }}
+          type: string
+        tags:
+          - name: {{ vertex.name }}
+            props:
+            {%- for prop in vertex.prop_list %}
+              - name: {{ prop.name }}
+                type: {{ prop.type }}
+                index: {{ prop.index}}
+            {%- endfor %}
+{% endfor -%}
+
+{%- for edge in edge_list: %}
+  - path: {{ edge.path }}
+    failDataPath: ./err/data/{{ edge.name }}.csv
+    batchSize: 100
+    type: csv
+    csv:
+      withHeader: false
+      withLabel: false
+      delimiter: "|"
+    schema:
+      type: edge
+      edge:
+        name: {{ edge.name }}
+        withRanking: false
+        srcVID:
+          index: {{ edge.src_index }}
+          type: string
+        dstVID:
+          index: {{ edge.dst_index }}
+          type: string
+        props:
+          {%- for prop in edge.prop_list %}
+          - name: {{ prop.name }}
+            type: {{ prop.type }}
+            index: {{ prop.index}}
+          {%-endfor %}
+{% endfor %}
+
