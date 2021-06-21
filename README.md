@@ -18,6 +18,10 @@ The main features:
 
 ```bash
 sudo yum install -y git \
+                    make \
+                    file \
+                    libev \
+                    libev-devel \
                     gcc \
                     wget \
                     python3 \
@@ -25,8 +29,7 @@ sudo yum install -y git \
                     java-1.8.0-openjdk \
                     maven 
 
-# install python dependencies
-sudo pip3 install -r requirements.txt
+
 ```
 
 ```bash

@@ -6,6 +6,8 @@ from nebula_bench.utils import logger
 from nebula_bench.controller import NebulaController
 from nebula_bench.utils import run_process
 
+SH_COMMAND = '/bin/bash'
+
 
 def common(f):
     f = click.option("-f", "--folder", help="ldbc data folder, default: target/data/test_data")(f)
@@ -40,16 +42,16 @@ def cli():
 def data(scale_factor, only_generate, only_split):
     my_env = {"scaleFactor": str(scale_factor)}
     if only_generate:
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
         run_process(command, my_env)
         return
     elif only_split:
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/split-data.sh"]
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/split-data.sh"]
         run_process(command)
     else:
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
         run_process(command, my_env)
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/split-data.sh"]
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/split-data.sh"]
         run_process(command)
 
 
