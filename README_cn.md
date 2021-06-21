@@ -2,11 +2,11 @@
 
 `Nebula-Bench` 用于测试 nebula-graph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
 
-当前只试用与 nebula graph v2.0 以上版本。
+当前只适用于 nebula graph v2.0 以上版本。
 
 主要功能:
 
-* 生产 LDBC 数据集并导入 nebula graph
+* 生产 LDBC 数据集并导入 nebula graph。
 * nebula-graph benchmark。 (未完成)
 
 ## 使用说明
