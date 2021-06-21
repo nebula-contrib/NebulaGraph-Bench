@@ -27,7 +27,7 @@ sudo pip3 install -r requirements.txt
 ```
 
 ```bash
-git clone https://github。com/vesoft-inc/nebula-bench.git 
+git clone https://github.com/vesoft-inc/nebula-bench.git 
 cd nebula-bench
 pip3 install --user -r requirement.txt
 python3 run.py --help
