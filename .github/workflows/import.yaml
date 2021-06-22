@@ -60,7 +60,7 @@ jobs:
           pushd nebula-docker-compose/
           cp ../../e2e/nebula/docker-compose.yaml .
           docker-compose up -d
-          sleep 20
+          sleep 5
           popd
           popd
 
@@ -70,4 +70,5 @@ jobs:
 
       - name: import the data
         run: |
-          python3 run.py nebula importer
+          python3 run.py nebula importer 
+          
