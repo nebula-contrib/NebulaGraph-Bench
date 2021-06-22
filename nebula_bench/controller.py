@@ -103,13 +103,14 @@ class NebulaController(BaseController):
         )
         self.vid_type = vid_type or "int"
 
-    def importer_space(self, dry_run=False):
+    def import_space(self, dry_run=False):
         self.update_config("graph", "heartbeat_interval_secs=1")
         self.update_config("storage", "heartbeat_interval_secs=1")
         result_file = self.dump_nebula_importer()
         command = ["scripts/nebula-importer", "--config", result_file]
         if not dry_run:
-            utils.run_process(command)
+            return utils.run_process(command)
+        return 0
 
     def init_space(self):
         """
@@ -125,6 +126,11 @@ class NebulaController(BaseController):
         self.submit_job("REBUILD TAG INDEX idx_person")
 
     def dump_nebula_importer(self):
+        _type = "int64" if self.vid_type == "int" else "fixed_string(20)"
+        statment = "CREATE SPACE IF NOT EXISTS {}(PARTITION_NUM = 24, REPLICA_FACTOR = 3, vid_type ={} );".format(
+            self.space, _type
+        )
+        self.nebula_session.execute(statment)
         p = parser.Parser(parser.NebulaDumper, self.data_folder)
         dumper = p.parse()
         kwargs = {}
@@ -217,7 +223,7 @@ class QueryController(BaseController):
     def __init__(
         self,
         alert_class=None,
-        report_class=QueryReporter,
+        report_class=None,
         space=None,
         user=None,
         password=None,
@@ -301,4 +307,5 @@ class QueryController(BaseController):
         pass
 
     def generate_report(self):
-        return self.report_class(self).report()
+        if self.report_class is not None:
+            return self.report_class(self).report()

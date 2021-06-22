@@ -3,8 +3,10 @@ import click
 
 from nebula_bench import setting
 from nebula_bench.utils import logger
-from nebula_bench.controller import StressController, QueryController, NebulaController
+from nebula_bench.controller import NebulaController
 from nebula_bench.utils import run_process
+
+SH_COMMAND = "/bin/bash"
 
 
 def common(f):
@@ -40,17 +42,20 @@ def cli():
 def data(scale_factor, only_generate, only_split):
     my_env = {"scaleFactor": str(scale_factor)}
     if only_generate:
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
-        run_process(command, my_env)
-        return
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
+        c = run_process(command, my_env)
+
     elif only_split:
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/split-data.sh"]
-        run_process(command)
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/split-data.sh"]
+        c = run_process(command)
     else:
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
-        run_process(command, my_env)
-        command = ["sh", setting.WORKSPACE_PATH / "scripts/split-data.sh"]
-        run_process(command)
+        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
+        c = run_process(command, my_env)
+        if c == 0:
+            command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/split-data.sh"]
+            b = run_process(command)
+
+    exit(c)
 
 
 @cli.group(help="operation for nebula graph")
@@ -87,7 +92,9 @@ def clean(address, user, password, keep):
 def importer(folder, address, user, password, space, vid_type, dry_run):
     assert vid_type in ["int", "string"], 'the vid type should be "ini" or "string" '
     nc = NebulaController(folder, space, user, password, address, vid_type)
-    nc.importer_space(dry_run)
+    c = nc.import_space(dry_run)
+    if c != 0:
+        exit(c)
     if not dry_run:
         click.echo("begin space compact")
         nc.compact()

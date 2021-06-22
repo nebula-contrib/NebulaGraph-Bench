@@ -9,30 +9,26 @@ package com.vesoft;
 import com.vesoft.nebula.client.graph.NebulaPoolConfig;
 import com.vesoft.nebula.client.graph.data.HostAddress;
 import com.vesoft.nebula.client.graph.data.ResultSet;
-import com.vesoft.nebula.client.graph.data.ValueWrapper;
 import com.vesoft.nebula.client.graph.net.NebulaPool;
 import com.vesoft.nebula.client.graph.net.Session;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.assertions.AssertionResult;
-
 
 /**
  * LDBC Go Step
  */
-public class LdbcGoStep implements JavaSamplerClient {
-    private static final Logger log = LoggerFactory.getLogger(LdbcGoStep.class);
+public class LdbcGoStep extends AbstractJavaSamplerClient {
+
+    private final Logger log = getNewLogger();
     private NebulaPool pool = null;
     private Session session = null;
 
@@ -59,8 +55,8 @@ public class LdbcGoStep implements JavaSamplerClient {
             nebulaPoolConfig.setMaxConnSize(maxconn);
             List<String> host_list = new ArrayList<String>(Arrays.asList(hosts.split(",")));
             if (host_list == null) {
-                System.out.println("host_list is null!");
-                System.exit(1);
+                log.error("host_list is null!");
+
             }
 
             String host = host_list.get(id % host_list.size());
@@ -71,16 +67,15 @@ public class LdbcGoStep implements JavaSamplerClient {
                 if (pool != null) {
                     pool.close();
                 }
-                System.out.println("pool init failed!");
-                System.exit(1);
+                log.info("pool init failed!");
+
             }
         } catch (Exception e) {
             e.printStackTrace();
             if (pool != null) {
                 pool.close();
             }
-            System.out.println("pool init failed!");
-            System.exit(1);
+            log.error("pool init failed, error message is ", e);
 
         } finally {
             log.info(String.format("initNebulaPool success!"));
@@ -106,23 +101,23 @@ public class LdbcGoStep implements JavaSamplerClient {
                 resp = session.execute(use_space);
                 if (!resp.isSucceeded()) {
                     System.out.println("Switch space failed:" + space);
+
                     System.exit(1);
                 }
             } else {
-                System.out.println("getSession failed !");
+                log.info("getSession failed !");
                 pool.close();
-                System.exit(1);
+
             }
         } catch (
                 Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             if (session != null) {
                 session.release();
             }
             if (pool != null) {
                 pool.close();
             }
-            System.exit(1);
         } finally {
             log.info(String.format("setupTest success!"));
         }
@@ -141,7 +136,7 @@ public class LdbcGoStep implements JavaSamplerClient {
         try {
             resp = session.execute(nGQL);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         long endTime = System.nanoTime();
