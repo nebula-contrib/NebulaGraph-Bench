@@ -1,5 +1,12 @@
 name: build
-on: [push, pull_request]
+on: 
+  push:
+    branches: [master]
+  pull_request:
+    branches:
+      - master
+      - "v[0-9]+.*"
+      
 jobs:
   
   build:

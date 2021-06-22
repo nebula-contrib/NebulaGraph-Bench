@@ -95,7 +95,7 @@ def run_process(command, env=None):
         while True:
             output = str(s.stdout.readline().decode("utf8"))
             if output == "" and s.poll() is not None:
-                break
+                return s.returncode
             if output:
                 output = output.replace("\n", "")
                 click.echo(output)
