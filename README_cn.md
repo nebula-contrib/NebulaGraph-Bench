@@ -88,7 +88,40 @@ python3 run.py nebula importer --dry-run
 
 ### nebula benchmark
 
-进行中，当前可以通过手动调整 Jmeter 来测试，具体参考 [jmx](ldbc/jmx/go_step.jmx) 和 [java](util/LdbcGoStep/src/main/java/vesoft/LdbcGoStep.java)。
+使用带有 [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) 插件的 [K6](https://github.com/k6io/k6) 来进行压测。
+需要注意，默认的 `k6` 是 linux 下编译的，如果需要在 Mac OS 上使用，请自行下载对应的二进制文件。[xk6-nebula](https://github.com/HarrisChu/xk6-nebula/tags)
+
+自动化的场景，在 `nebula_bench/scenarios/` 中。
+
+```bash
+# show help
+python3 run.py stress run --help
+
+# run all scenarios with 100 virtual users, every scenario lasts 60 seconds.
+python3 run.py stress run 
+
+# run all scenarios with 10 virtual users, every scenario lasts 3 seconds.
+python3 run.py stress run -vu 10 -d 3
+
+# run go.Go1Step scenarios with 10 virtual users, every scenario lasts 3 seconds.
+python3 run.py stress run -vu 10 -d 3 -s go.Go1Step
+```
+
+k6 config file, summary result and outputs are in `output` folder. e.g.
+
+```bash
+# you should install jq to parse json.
+# how many checks
+jq .metrics.checks output/result_Go1Step.json
+
+# summary latency
+jq .metrics.latency output/result_Go1Step.json
+
+# summary error message 
+awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
+```
+
+如果使用 Jmeter，暂时没有自动化操作，可以通过手动调整 Jmeter 来测试，具体参考 [jmx](ldbc/jmx/go_step.jmx) 和 [java](util/LdbcGoStep/src/main/java/vesoft/LdbcGoStep.java)。
 
 ## 更多
 
