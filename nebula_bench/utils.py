@@ -22,13 +22,15 @@ def load_class(package_name, load_all, base_class, class_name=None):
     r = []
     if load_all:
         _package = importlib.import_module(package_name)
-        p = Path(_package.__path__[0])
+        for namespace_p in _package.__path__:
+            p = Path(namespace_p)
+            break
         for _module_path in p.iterdir():
             name = _module_path.name.rsplit(".", 1)[0]
             _module = importlib.import_module(package_name + "." + name)
             for name in dir(_module):
                 _class = getattr(_module, name)
-                if type(_class) != type:
+                if not isinstance(_class, type):
                     continue
                 if issubclass(_class, base_class) and _class.__name__ != base_class.__name__:
                     r.append(_class)
