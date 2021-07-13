@@ -32,7 +32,7 @@ sudo yum install -y git \
 ```bash
 git clone https://github.com/vesoft-inc/nebula-bench.git 
 cd nebula-bench
-pip3 install --user -r requirement.txt
+pip3 install --user -r requirements.txt
 python3 run.py --help
 ```
 
