@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 import re
 import time
-import gevent
 from collections import deque
 import csv
 from pathlib import Path
@@ -138,85 +137,19 @@ class ScenarioMeta(type):
         # super(ScenarioMeta, cls).__new__(cls, name, bases, attrs, *args, **kwargs)
         if name == "BaseScenario":
             return type.__new__(cls, name, bases, attrs)
-        report_name = attrs.get("report_name")
-        result_file_name = attrs.get("result_file_name")
-        if result_file_name is None:
-            result_file_name = "_".join(report_name.split(" "))
-            attrs["result_file_name"] = result_file_name
-        statement = attrs.get("statement")
-        parameters = attrs.get("parameters") or ()
-        latency_warning_us = attrs.get("latency_warning_us")
-        _generator = StmtGenerator(statement, parameters, setting.DATA_FOLDER)
-        flag = False
-
-        attrs["generator"] = _generator
-        attrs["client"] = NebulaClient()
-
-        def my_task(self):
-            nonlocal flag
-
-            stmt = next(_generator)
-
-            # sleep for first request
-            if not flag:
-                logger.info("first stmt is {}".format(stmt))
-                gevent.sleep(3)
-                flag = True
-
-            cur_time = time.monotonic()
-            r = self.client.execute(stmt)
-            total_time = time.monotonic() - cur_time
-            assert isinstance(r, ResultSet)
-            # warning the latency for slow statement.
-            if latency_warning_us is not None:
-                if r.latency() > latency_warning_us:
-                    logger.warning("the statement [{}] latency is {} us".format(stmt, r.latency()))
-            if r.is_succeeded():
-                self.environment.events.request_success.fire(
-                    request_type="Nebula",
-                    name=report_name,
-                    response_time=total_time * 1000,
-                    response_length=0,
-                )
-            else:
-                logger.error(
-                    "the statement [{}] is not succeeded, error message is {}".format(
-                        stmt, r.error_msg()
-                    )
-                )
-                self.environment.events.request_failure.fire(
-                    request_type="Nebula",
-                    name=report_name,
-                    response_time=total_time * 1000,
-                    response_length=0,
-                    exception=Exception(r.error_msg()),
-                )
-
-        attrs["tasks"] = [my_task]
+        if attrs.get("name", None) is None:
+            attrs["name"] = name
 
         return type.__new__(cls, name, bases, attrs)
 
 
 class BaseScenario(metaclass=ScenarioMeta):
     abstract = True
-    report_name: str
-    result_file_name: str
-    statement: str
-    parameters = ()
-
-    def __init__(self, environment):
-        from locust.user.users import UserMeta
-
-        self.environment = environment
-
-    def on_start(self):
-        self.client.add_session()
-
-    def on_stop(self):
-        self.client.release_session()
-
-
-query = namedtuple("query", ["name", "stmt"])
+    nGQL: str
+    stage: dict
+    csv_path: str
+    csv_index: list
+    name: str
 
 
 class BaseQuery(object):

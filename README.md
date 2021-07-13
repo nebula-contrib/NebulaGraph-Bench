@@ -95,7 +95,39 @@ python3 run.py nebula importer --dry-run
 
 ### nebula benchmark
 
-Work in progress.
+Use [k6](https://github.com/k6io/k6) with [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) extension.
+Be careful, the default `k6` in scripts folder is built in Linux, if you want to
+run the tool in Mac OS, please download by youself. [xk6-nebula](https://github.com/HarrisChu/xk6-nebula/tags)
+
+Scenarios are in `nebula_bench/scenarios/`.
+
+```bash
+# show help
+python3 run.py stress run --help
+
+# run all scenarios with 100 virtual users, every scenario lasts 60 seconds.
+python3 run.py stress run 
+
+# run all scenarios with 10 virtual users, every scenario lasts 3 seconds.
+python3 run.py stress run -vu 10 -d 3
+
+# run go.Go1Step scenarios with 10 virtual users, every scenario lasts 3 seconds.
+python3 run.py stress run -vu 10 -d 3 -s go.Go1Step
+```
+
+k6 config file, summary result and outputs are in `output` folder. e.g.
+
+```bash
+# you should install jq to parse json.
+# how many checks
+jq .metrics.checks output/result_Go1Step.json
+
+# summary latency
+jq .metrics.latency output/result_Go1Step.json
+
+# summary error message 
+awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
+```
 
 ## and more
 

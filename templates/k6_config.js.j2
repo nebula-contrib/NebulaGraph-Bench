@@ -1,0 +1,48 @@
+import nebulaPool from 'k6/x/nebulagraph';
+import { check } from 'k6';
+import { Trend } from 'k6/metrics';
+import { sleep } from 'k6';
+
+var lantencyTrend = new Trend('latency');
+var responseTrend = new Trend('responseTime');
+// initial nebula connect pool
+var pool = nebulaPool.init("{{ address }}", 2000);
+// initial session for every vu
+var session = pool.getSession("{{ user }}", "{{ password }}")
+session.execute("USE {{ space }}")
+
+
+String.prototype.format = function () {
+  var formatted = this;
+  for (var arg in arguments) {
+    formatted = formatted.replace("{}", arguments[arg]);
+  }
+  return formatted;
+};
+
+export function setup() {
+  // config csv file
+  pool.configCSV("{{ csv_path }}", "|", false)
+  // config output file, save every query information
+  pool.configOutput("{{ output_path }}")
+  sleep(1)
+}
+
+export default function (data) {
+
+  // get csv data from csv file
+  let d = pool.getData()
+  // d[0] means the first column data in the csv file
+  let ngql = "{{ nGQL }}".format({{ param }})
+  let response = session.execute(ngql)
+  check(response, {
+    "IsSucceed": (r) => r.isSucceed() === true
+  });
+  // add trend
+  lantencyTrend.add(response.getLatency());
+  responseTrend.add(response.getResponseTime());
+};
+
+export function teardown() {
+  pool.close()
+}
