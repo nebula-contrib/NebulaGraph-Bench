@@ -25,3 +25,4 @@ mysql/data
 .env
 nebula-bench.db
 .vscode
+output

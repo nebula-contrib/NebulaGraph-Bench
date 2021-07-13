@@ -70,5 +70,8 @@ jobs:
 
       - name: import the data
         run: |
-          python3 run.py nebula importer 
-          
+          python3 run.py nebula importer
+
+      - name: run stress testing
+        run: |
+          python3 run.py stress run -d 3

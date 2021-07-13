@@ -5,6 +5,8 @@ from nebula_bench import setting
 from nebula_bench.utils import logger
 from nebula_bench.controller import NebulaController
 from nebula_bench.utils import run_process
+from nebula_bench.stress import StressFactory
+
 
 SH_COMMAND = "/bin/bash"
 
@@ -102,21 +104,62 @@ def importer(folder, address, user, password, space, vid_type, dry_run):
     nc.release()
 
 
-# @nebula.command(help="initial nebula graph, including create indexes")
-# @common
-# def init(folder, address, user, password, space):
-#     nc = NebulaController(
-#         data_folder=folder,
-#         user=user,
-#         password=password,
-#         address=address,
-#         space=space,
-#         vid_type="int",
-#     )
+@nebula.command(help="initial nebula graph, including create indexes")
+@common
+def init(folder, address, user, password, space):
+    nc = NebulaController(
+        data_folder=folder,
+        user=user,
+        password=password,
+        address=address,
+        space=space,
+        vid_type="int",
+    )
 
-#     nc.init_space()
+    nc.init_space()
 
 
-# @cli.group()
-# def stress():
-#     pass
+@cli.group()
+def stress():
+    pass
+
+
+@stress.command()
+@common
+@click.option(
+    "-t",
+    "--vid-type",
+    default="int",
+    help="space vid type, values should be [int, string], default: int",
+)
+@click.option("-vu", default=100, help="concurrent virtual users, default: 100")
+@click.option(
+    "-d", "--duration", default=60, help="duration for every scenario, unit: second, default: 60"
+)
+@click.option("-s", "--scenarioes", default="all", help="special scenarioes, e.g. go.Go1Step")
+@click.option("-c", "--controller", default="k6", help="using which test tool")
+@click.option(
+    "--dry-run",
+    default=False,
+    is_flag=True,
+    help="Dry run, just dump stress testing config file, default: False",
+)
+def run(
+    folder, address, user, password, space, vid_type, scenarioes, controller, vu, duration, dry_run
+):
+    stress = StressFactory.gen_stress(
+        _type=controller,
+        folder=folder,
+        address=address,
+        user=user,
+        password=password,
+        space=space,
+        vid_type=vid_type,
+        scenarios=scenarioes,
+        vu=vu,
+        duration=duration,
+        dry_run=dry_run,
+    )
+    stress.run()
+
+    pass
