@@ -1,0 +1,6 @@
+process_names:
+  - name: "qa-61-{{.Comm}}"
+    comm:
+    - nebula-metad
+    - nebula-storaged
+    - nebula-graphd
