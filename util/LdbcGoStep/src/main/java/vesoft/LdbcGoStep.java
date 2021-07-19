@@ -31,6 +31,7 @@ public class LdbcGoStep extends AbstractJavaSamplerClient {
     private final Logger log = getNewLogger();
     private NebulaPool pool = null;
     private Session session = null;
+    private Integer maxVars = 20;
 
 
     @Override
@@ -100,8 +101,7 @@ public class LdbcGoStep extends AbstractJavaSamplerClient {
                 ResultSet resp = null;
                 resp = session.execute(use_space);
                 if (!resp.isSucceeded()) {
-                    System.out.println("Switch space failed:" + space);
-
+                    System.out.println("Switch space failed:" + space + "\nError is " + resp.getErrorMessage());
                     System.exit(1);
                 }
             } else {
@@ -126,9 +126,14 @@ public class LdbcGoStep extends AbstractJavaSamplerClient {
 
     @Override
     public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-        String person = javaSamplerContext.getParameter("person");
         String nGQL = javaSamplerContext.getParameter("nGQL");
-        nGQL = nGQL.replace("replace", person);
+        for (int i=0;i<maxVars;i++){
+            String var = "var" + String.valueOf(i);
+            String value = javaSamplerContext.getParameter(var);
+            if (value != null){
+                nGQL = nGQL.replace(var, value);
+            }
+        }
         ResultSet resp = null;
         long stamp = System.currentTimeMillis();
         long startTime = System.nanoTime();

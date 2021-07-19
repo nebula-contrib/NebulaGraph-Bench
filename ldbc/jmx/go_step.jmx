@@ -7,7 +7,7 @@
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-        <collectionProp name="Arguments.arguments"/>
+        <collectionProp name="Arguments.arguments" />
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
@@ -18,54 +18,55 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">-1</stringProp>
         </elementProp>
-	<stringProp name="ThreadGroup.num_threads">{nums}</stringProp>
+        <stringProp name="ThreadGroup.num_threads">{nums}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">0</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-	<stringProp name="ThreadGroup.duration">{duration}</stringProp>
+        <stringProp name="ThreadGroup.duration">{duration}</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Java Request" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
-           <collectionProp name="Arguments.arguments">
-	       <elementProp name="hosts" elementType="Argument">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="hosts" elementType="Argument">
                 <stringProp name="Argument.name">hosts</stringProp>
-                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.value">{hosts}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
-	</elementProp>
- <elementProp name="maxconn" elementType="Argument">
+              </elementProp>
+              <elementProp name="maxconn" elementType="Argument">
                 <stringProp name="Argument.name">maxconn</stringProp>
                 <stringProp name="Argument.value">10</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
-	</elementProp>
- <elementProp name="user" elementType="Argument">
+              </elementProp>
+              <elementProp name="user" elementType="Argument">
                 <stringProp name="Argument.name">user</stringProp>
-                <stringProp name="Argument.value"></stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>	
-              <elementProp name="pwd" elementType="Argument">
-                <stringProp name="Argument.name">pwd</stringProp>
-                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.value">{user}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="var2" elementType="Argument">
+              <elementProp name="pwd" elementType="Argument">
+                <stringProp name="Argument.name">pwd</stringProp>
+                <stringProp name="Argument.value">{pwd}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="space" elementType="Argument">
                 <stringProp name="Argument.name">space</stringProp>
-                <stringProp name="Argument.value">ldbc</stringProp>
+                <stringProp name="Argument.value">{space}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
 
-	      <elementProp name="person" elementType="Argument">
-                <stringProp name="Argument.name">person</stringProp>
-		<stringProp name="Argument.value">${person}</stringProp>
+              <elementProp name="var2" elementType="Argument">
+                <stringProp name="Argument.name">var2</stringProp>
+                <stringProp name="Argument.value">${c2}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+
               <elementProp name="nGQL" elementType="Argument">
                 <stringProp name="Argument.name">nGQL</stringProp>
-                <stringProp name="Argument.value">GO 3 STEP FROM "replace" OVER knows</stringProp>
+                <stringProp name="Argument.value">GO 3 STEP FROM var2 OVER knows</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-      </collectionProp>
+            </collectionProp>
 
           </elementProp>
           <stringProp name="classname">com.vesoft.LdbcGoStep</stringProp>
@@ -80,9 +81,10 @@
             <boolProp name="recycle">true</boolProp>
             <stringProp name="shareMode">shareMode.all</stringProp>
             <boolProp name="stopThread">false</boolProp>
-            <stringProp name="variableNames">var1,person,var3,var4,var5,var6,var7,var8</stringProp>
-          </CSVDataSet>`
-          <hashTree/>
+            <stringProp name="variableNames">c1,c2,c3,c4,c5,c6,c7,c8</stringProp>
+          </CSVDataSet>
+          
+          <hashTree />
         </hashTree>
       </hashTree>
     </hashTree>
