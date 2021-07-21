@@ -9,6 +9,16 @@ from nebula_bench.utils import logger
 from nebula_bench import setting
 
 
+def load_scenarios(scenarios):
+    if scenarios.strip().upper() == "ALL":
+        r = load_class("nebula_bench.scenarios", True, BaseScenario)
+    else:
+        r = load_class("nebula_bench.scenarios", False, BaseScenario, scenarios)
+
+    r = [x for x in r if x.abstract == False]
+    return r
+
+
 class Stress(object):
     def __init__(
         self,
@@ -35,15 +45,7 @@ class Stress(object):
         self.vu = vu
         self.duration = duration
         self.dry_run = dry_run
-        self.load_scenarios(scenarios)
-
-    def load_scenarios(self, scenarios):
-        if scenarios.strip().upper() == "ALL":
-            self.scenarios = load_class("nebula_bench.scenarios", True, BaseScenario)
-        else:
-            self.scenarios = load_class("nebula_bench.scenarios", False, BaseScenario, scenarios)
-
-        self.scenarios = [x for x in self.scenarios if x.abstract == False]
+        self.scenarios = load_scenarios(scenarios)
         logger.info("total stress test scenarios is {}".format(len(self.scenarios)))
 
     # dump config file
