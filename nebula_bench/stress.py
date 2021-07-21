@@ -141,6 +141,8 @@ class K6Stress(Stress):
                 str(self.vu),
                 "-d",
                 "{}s".format(self.duration),
+                "--summary-trend-stats",
+                "min,avg,med,max,p(90),p(95),p(99)",
                 "--summary-export",
                 "{}/result_{}.json".format(self.output_folder, scenario.name),
             ]
