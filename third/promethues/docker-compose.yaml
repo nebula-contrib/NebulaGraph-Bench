@@ -41,3 +41,18 @@ services:
 
     volumes:
       - ./grafana:/var/lib/grafana:rw
+
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+      - "8083:8083"
+    environment:
+      - INFLUXDB_DATA_ENGINE=tsm1
+      - INFLUXDB_DB=k6
+
+    volumes:
+      # Data persistency
+      - ./influxdb:/var/lib/influxdb

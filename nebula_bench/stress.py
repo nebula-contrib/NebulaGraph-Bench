@@ -3,6 +3,8 @@ import sys
 import inspect
 from pathlib import Path
 
+import click
+
 from nebula_bench.utils import load_class, jinja_dump, run_process
 from nebula_bench.common.base import BaseScenario
 from nebula_bench.utils import logger
@@ -145,9 +147,13 @@ class K6Stress(Stress):
                 "{}s".format(self.duration),
                 "--summary-trend-stats",
                 "min,avg,med,max,p(90),p(95),p(99)",
+                "--out",
+                "influxdb={}".format(setting.INFLUXDB_URL),
                 "--summary-export",
                 "{}/result_{}.json".format(self.output_folder, scenario.name),
             ]
+            click.echo("run command as below:")
+            click.echo(" ".join(command))
             if self.dry_run is not None and self.dry_run:
                 continue
             run_process(command)
