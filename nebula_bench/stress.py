@@ -3,10 +3,22 @@ import sys
 import inspect
 from pathlib import Path
 
+import click
+
 from nebula_bench.utils import load_class, jinja_dump, run_process
 from nebula_bench.common.base import BaseScenario
 from nebula_bench.utils import logger
 from nebula_bench import setting
+
+
+def load_scenarios(scenarios):
+    if scenarios.strip().upper() == "ALL":
+        r = load_class("nebula_bench.scenarios", True, BaseScenario)
+    else:
+        r = load_class("nebula_bench.scenarios", False, BaseScenario, scenarios)
+
+    r = [x for x in r if x.abstract == False]
+    return r
 
 
 class Stress(object):
@@ -35,15 +47,7 @@ class Stress(object):
         self.vu = vu
         self.duration = duration
         self.dry_run = dry_run
-        self.load_scenarios(scenarios)
-
-    def load_scenarios(self, scenarios):
-        if scenarios.strip().upper() == "ALL":
-            self.scenarios = load_class("nebula_bench.scenarios", True, BaseScenario)
-        else:
-            self.scenarios = load_class("nebula_bench.scenarios", False, BaseScenario, scenarios)
-
-        self.scenarios = [x for x in self.scenarios if x.abstract == False]
+        self.scenarios = load_scenarios(scenarios)
         logger.info("total stress test scenarios is {}".format(len(self.scenarios)))
 
     # dump config file
@@ -141,9 +145,15 @@ class K6Stress(Stress):
                 str(self.vu),
                 "-d",
                 "{}s".format(self.duration),
+                "--summary-trend-stats",
+                "min,avg,med,max,p(90),p(95),p(99)",
+                "--out",
+                "influxdb={}".format(setting.INFLUXDB_URL),
                 "--summary-export",
                 "{}/result_{}.json".format(self.output_folder, scenario.name),
             ]
+            click.echo("run command as below:")
+            click.echo(" ".join(command))
             if self.dry_run is not None and self.dry_run:
                 continue
             run_process(command)

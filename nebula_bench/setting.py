@@ -27,3 +27,4 @@ else:
     NEBULA_MAX_CONNECTION = 400
 
 SQLALCHEMY_URI = os.environ.get("SQLALCHEMY_URI") or "sqlite:///./nebula-bench.db"
+INFLUXDB_URL = os.environ.get("INFLUXDB_URL") or "http://127.0.0.1:8086/k6"

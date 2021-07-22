@@ -1,0 +1,35 @@
+
+version: '3.7'
+
+
+services:
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command: 
+      - '--path.procfs=/host/proc' 
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    network_mode: host
+    restart: always
+
+  process-exporter:
+    image: ncabatoff/process-exporter
+    volumes: 
+      - /proc:/host/proc
+      - ./filename.yml:/config/filename.yml
+    command: 
+      - --procfs
+      - /host/proc
+      - -config.path 
+      - /config/filename.yml
+      
+    network_mode: host
+
+    
+    restart: always
+    privileged: true

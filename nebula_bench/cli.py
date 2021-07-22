@@ -5,7 +5,7 @@ from nebula_bench import setting
 from nebula_bench.utils import logger
 from nebula_bench.controller import NebulaController
 from nebula_bench.utils import run_process
-from nebula_bench.stress import StressFactory
+from nebula_bench.stress import StressFactory, load_scenarios
 
 
 SH_COMMAND = "/bin/bash"
@@ -136,7 +136,7 @@ def stress():
 @click.option(
     "-d", "--duration", default=60, help="duration for every scenario, unit: second, default: 60"
 )
-@click.option("-s", "--scenarioes", default="all", help="special scenarioes, e.g. go.Go1Step")
+@click.option("-scenario", default="all", help="run special scenario, e.g. go.Go1Step")
 @click.option("-c", "--controller", default="k6", help="using which test tool")
 @click.option(
     "--dry-run",
@@ -145,7 +145,7 @@ def stress():
     help="Dry run, just dump stress testing config file, default: False",
 )
 def run(
-    folder, address, user, password, space, vid_type, scenarioes, controller, vu, duration, dry_run
+    folder, address, user, password, space, vid_type, scenario, controller, vu, duration, dry_run
 ):
     stress = StressFactory.gen_stress(
         _type=controller,
@@ -155,7 +155,7 @@ def run(
         password=password,
         space=space,
         vid_type=vid_type,
-        scenarios=scenarioes,
+        scenarios=scenario,
         vu=vu,
         duration=duration,
         dry_run=dry_run,
@@ -163,3 +163,14 @@ def run(
     stress.run()
 
     pass
+
+
+@stress.command()
+def scenarios():
+    click.echo("All scenarios as below:")
+
+    scenarios = load_scenarios("all")
+    for s in scenarios:
+        module = s.__module__.split(".")[-1]
+        name = s.__name__
+        click.echo("\t{}.{}".format(module, name))

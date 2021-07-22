@@ -26,3 +26,4 @@ mysql/data
 nebula-bench.db
 .vscode
 output
+third/*/data

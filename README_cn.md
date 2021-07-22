@@ -103,8 +103,11 @@ python3 run.py stress run
 # run all scenarios with 10 virtual users, every scenario lasts 3 seconds.
 python3 run.py stress run -vu 10 -d 3
 
+# list all stress test scenarios
+python3 run.py stress scenarios
+
 # run go.Go1Step scenarios with 10 virtual users, every scenario lasts 3 seconds.
-python3 run.py stress run -vu 10 -d 3 -s go.Go1Step
+python3 run.py stress run -vu 10 -d 3 -scenario go.Go1Step
 ```
 
 k6 config file, summary result and outputs are in `output` folder. e.g.
