@@ -59,8 +59,8 @@ docker-compose up -d
 ### InfluxDB
 
 为了方便，influxdb 默认放在 promethues 的 docker-compose.yml 中，启动 prometheus 时，会自动启动。
+docker-compose 中，配置了默认数据库为 `k6`。
 
-* 执行命令新建一个 influxdb 的数据库，`docker exec -it influxdb influx -execute "create database k6"`
 * 在 `.env` 中，配置 influxdb 的地址，如：`http://192.168.8.60:8086/k6`。
 * 登录 grafana，添加 influxdb 数据源。
 * 添加 dashboard，json 文件见 [k6_influxdb.json](./promethues/k6_influxdb.json)。
