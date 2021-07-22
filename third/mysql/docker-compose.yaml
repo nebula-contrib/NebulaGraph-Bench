@@ -2,8 +2,8 @@ version: '3.4'
 services:
   mysql:
     image: mysql:5.6
-    ports: 
-      - 3306:3306
+    # ports: 
+    #   - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=admin
       - TZ=Asiz/Shanghai
@@ -12,3 +12,4 @@ services:
       - ./mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf:rw
       - ./data:/var/lib/mysql
 
+    network_mode: host

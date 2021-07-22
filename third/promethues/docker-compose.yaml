@@ -1,0 +1,58 @@
+
+version: '3.7'
+
+
+networks:
+  monitor:
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    user: root
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus:rw
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention=15d'
+    ports:
+      - 9090:9090
+    # links:
+      # - alertmanager:alertmanager
+    # depends_on:
+    networks:
+      - monitor
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    user: root
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+
+    networks:
+      - monitor
+    restart: always
+
+    volumes:
+      - ./data/grafana:/var/lib/grafana:rw
+
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+      - "8083:8083"
+    environment:
+      - INFLUXDB_DATA_ENGINE=tsm1
+      - INFLUXDB_DB=k6
+
+    volumes:
+      # Data persistency
+      - ./data/influxdb:/var/lib/influxdb
