@@ -47,6 +47,8 @@ prepare nebula tools.
 sh scripts/setup.sh
 ```
 
+After compilation, it would put binaries in `scripts` folder.
+
 ### generate ldbc data
 
 ```bash
@@ -83,9 +85,6 @@ python3 run.py nebula importer
 
 Render the import config file according to the header files, and then run nebula-importer.
 
-Be careful, the default `nebula-import` in scripts folder is built in Linux, if you want to
-run the tool in Mac OS, please build the nebula-import by yourself.
-
 ```bash
 # after prepare the data, you could import the data to any nebula graph as you want.
 # space is mytest, graph address is 127.0.0.1:9669
@@ -104,8 +103,6 @@ python3 run.py nebula importer --dry-run
 ### nebula benchmark
 
 Use [k6](https://github.com/k6io/k6) with [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) extension.
-Be careful, the default `k6` in scripts folder is built in Linux, if you want to
-run the tool in Mac OS, please download by youself. [xk6-nebula](https://github.com/HarrisChu/xk6-nebula/tags)
 
 Scenarios are in `nebula_bench/scenarios/`.
 

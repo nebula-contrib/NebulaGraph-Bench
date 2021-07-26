@@ -53,6 +53,8 @@ sh scripts/setup.sh
 export GOPROXY=https://goproxy.cn
 ```
 
+编译后，二进制包在 `scripts` 文件夹中。
+
 ### 生成 LDBC 数据
 
 ```bash
@@ -86,7 +88,6 @@ python3 run.py nebula importer
 ```
 
 会根据 header 文件，自动生成 importer 的配置文件，然后运行 importer 导入。
-需要注意，默认的 `nebula-importer` 是 linux 下编译的，如果需要在 Mac OS 上使用，请自行编译一个新的 `nebula-importer`。
 
 ```bash
 # after prepare the data, you could import the data to any nebula graph as you want.
@@ -106,7 +107,6 @@ python3 run.py nebula importer --dry-run
 ### nebula benchmark
 
 使用带有 [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) 插件的 [K6](https://github.com/k6io/k6) 来进行压测。
-需要注意，默认的 `k6` 是 linux 下编译的，如果需要在 Mac OS 上使用，请自行下载对应的二进制文件。[xk6-nebula](https://github.com/HarrisChu/xk6-nebula/tags)
 
 自动化的场景，在 `nebula_bench/scenarios/` 中。
 
