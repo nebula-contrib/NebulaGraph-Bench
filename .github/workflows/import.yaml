@@ -46,6 +46,10 @@ jobs:
         with:
           maven-version: 3.5.4
 
+      - uses: actions/setup-go@v1
+        with:
+          go-version: 1.16.4
+
       - name: Cache Hadoop
         uses: actions/cache@v2
         with:
@@ -63,6 +67,15 @@ jobs:
           sleep 5
           popd
           popd
+
+      - name: setup go tools
+        env:
+          CGO_ENABLED: 0
+        run: |
+          export GOPATH=$HOME/go
+          export GOBIN=$(go env GOPATH)/bin
+          export PATH=$PATH:$GOBIN
+          /bin/bash scripts/setup.sh
 
       - name: generate the data
         run: |

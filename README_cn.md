@@ -44,7 +44,7 @@ python3 run.py --help
 * [xk6-nebula](https://github.com/HarrisChu/xk6-nebula)
 
 ```bash
-sh scripts/setup.sh
+/bin/bash scripts/setup.sh
 ```
 
 如果 go get 的包下载不下来，需要设置 golang 代理。
