@@ -73,7 +73,7 @@ jobs:
           CGO_ENABLED: 0
         run: |
           export GOPATH=$HOME/go
-          export GOBIN=$(go env GOPATH)/bin
+          export GOBIN=$GOPATH/bin
           export PATH=$PATH:$GOBIN
           /bin/bash scripts/setup.sh
 
