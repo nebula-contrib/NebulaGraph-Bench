@@ -27,3 +27,5 @@ nebula-bench.db
 .vscode
 output
 third/*/data
+scripts/k6
+scripts/nebula-importer
