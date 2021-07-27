@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Directory of this script
 SCRIPT_DIR=$(cd "$(dirname "$0")"; pwd)
@@ -17,7 +18,7 @@ if [ -d ${HADOOP_HOME} ];then
   echo "Hadoop is existed"
 else
   cd ${DATA_DIR} && \
-  wget -c http://archive.apache.org/dist/hadoop/core/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
+  wget -c   http://archive.apache.org/dist/hadoop/core/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz 
   echo "extract hadoop files"
   tar zxvf hadoop-${HADOOP_VERSION}.tar.gz -C ${DATA_DIR} >  /dev/null
   echo "extract hadoop files done"

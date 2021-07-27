@@ -29,7 +29,6 @@ sudo yum install -y git \
                     java-1.8.0-openjdk \
                     maven 
 
-
 ```
 
 ```bash
@@ -38,6 +37,17 @@ cd nebula-bench
 pip3 install --user -r requirements.txt
 python3 run.py --help
 ```
+
+prepare nebula tools.
+
+* [nebula-importer](https://github.com/vesoft-inc/nebula-importer)
+* [xk6-nebula](https://github.com/HarrisChu/xk6-nebula)
+
+```bash
+/bin/bash scripts/setup.sh
+```
+
+After compilation, it would put binaries in `scripts` folder.
 
 ### generate ldbc data
 
@@ -75,9 +85,6 @@ python3 run.py nebula importer
 
 Render the import config file according to the header files, and then run nebula-importer.
 
-Be careful, the default `nebula-import` in scripts folder is built in Linux, if you want to
-run the tool in Mac OS, please build the nebula-import by yourself.
-
 ```bash
 # after prepare the data, you could import the data to any nebula graph as you want.
 # space is mytest, graph address is 127.0.0.1:9669
@@ -96,8 +103,6 @@ python3 run.py nebula importer --dry-run
 ### nebula benchmark
 
 Use [k6](https://github.com/k6io/k6) with [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) extension.
-Be careful, the default `k6` in scripts folder is built in Linux, if you want to
-run the tool in Mac OS, please download by youself. [xk6-nebula](https://github.com/HarrisChu/xk6-nebula/tags)
 
 Scenarios are in `nebula_bench/scenarios/`.
 
@@ -131,6 +136,30 @@ jq .metrics.latency output/result_Go1Step.json
 # summary error message 
 awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
 ```
+
+or, just review the sumary result in stdout. e.g.
+
+```bash
+     ✓ IsSucceed
+
+     █ setup
+
+     █ teardown
+
+     checks...............: 100.00% ✓ 113778      ✗ 0
+     data_received........: 0 B     0 B/s
+     data_sent............: 0 B     0 B/s
+     iteration_duration...: min=747.84µs avg=52.76ms      med=40.77ms max=1.17s   p(90)=98.68ms p(95)=147.15ms  p(99)=263.03ms
+     iterations...........: 113778  1861.550127/s
+     latency..............: min=462      avg=49182.770298 med=37245   max=1160358 p(90)=93377   p(95)=142304.15 p(99)=258465.89
+     responseTime.........: min=662      avg=52636.793537 med=40659   max=1177651 p(90)=98556.5 p(95)=147036.15 p(99)=262869.63
+     vus..................: 100     min=0         max=100
+     vus_max..............: 100     min=100       max=100
+```
+
+As one iteration has one check, it means run `113778` queries.
+
+The unit of latency is `us`.
 
 ## and more
 
