@@ -46,10 +46,10 @@ function setup_go(){
     x86_64)  arch=amd64;;
     aarch64) arch=arm64;;
   esac
-  curl -fSL -C - https://golang.org/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz -O -#
+  wget -c https://golang.org/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz 
 
   if [ $? != 0 ] ; then
-    curl -fSL -C - https://golang.google.cn/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz -O -#
+    wget -c https://golang.google.cn/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz
     if [ $? !=0 ] ; then
       echo "cannot download golang installation package, please install manually."
       exit 1
