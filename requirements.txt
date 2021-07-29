@@ -2,5 +2,3 @@ Jinja2 == 2.11.3
 click == 7.1.2
 nebula2-python == 2.0.0
 python-dotenv == 0.16.0
-locust
-pymysql

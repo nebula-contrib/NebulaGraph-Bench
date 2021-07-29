@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
+import inspect
 import importlib
-from pathlib import Path
 import socket
-import json
 import logging
-import base64
-import hashlib
-import hmac
-import time
-import urllib
 
 import jinja2
 import click
@@ -22,15 +16,15 @@ def load_class(package_name, load_all, base_class, class_name=None):
     r = []
     if load_all:
         _package = importlib.import_module(package_name)
-        for namespace_p in _package.__path__:
-            p = Path(namespace_p)
-            break
-        for _module_path in p.iterdir():
-            name = _module_path.name.rsplit(".", 1)[0]
-            _module = importlib.import_module(package_name + "." + name)
+        for attr in dir(_package):
+            _module = getattr(_package, attr)
+            if not inspect.ismodule(_module):
+                continue
+
+            # _module = importlib.import_module(package_name + "." + name)
             for name in dir(_module):
                 _class = getattr(_module, name)
-                if not isinstance(_class, type):
+                if not inspect.isclass(_class):
                     continue
                 if issubclass(_class, base_class) and _class.__name__ != base_class.__name__:
                     r.append(_class)
