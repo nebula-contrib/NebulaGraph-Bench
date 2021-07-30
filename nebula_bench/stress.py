@@ -147,11 +147,13 @@ class K6Stress(Stress):
                 "{}s".format(self.duration),
                 "--summary-trend-stats",
                 "min,avg,med,max,p(90),p(95),p(99)",
-                "--out",
-                "influxdb={}".format(setting.INFLUXDB_URL),
                 "--summary-export",
                 "{}/result_{}.json".format(self.output_folder, scenario.name),
             ]
+            if setting.INFLUXDB_URL is not None:
+                command.append("--out")
+                command.append("influxdb={}".format(setting.INFLUXDB_URL))
+
             click.echo("run command as below:")
             click.echo(" ".join(command))
             if self.dry_run is not None and self.dry_run:
