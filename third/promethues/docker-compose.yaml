@@ -52,6 +52,8 @@ services:
     environment:
       - INFLUXDB_DATA_ENGINE=tsm1
       - INFLUXDB_DB=k6
+      # 50MB
+      - INFLUXDB_HTTP_MAX_BODY_SIZE=52428800
 
     volumes:
       # Data persistency

@@ -2,5 +2,3 @@ Jinja2
 click
 nebula2-python == 2.0.0
 python-dotenv
-pyinstaller
-wheel
