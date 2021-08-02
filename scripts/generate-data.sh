@@ -1,8 +1,19 @@
 #!/bin/bash
 set -e
+shopt -s expand_aliases
+
+# cross-OS compatibility (greadlink, gsed, zcat are GNU implementations for OS X)
+[[ `uname` == 'Darwin' ]] && {
+	which greadlink gsed gzcat > /dev/null && {
+		alias readlink=greadlink sed=gsed zcat=gzcat
+	} || {
+		echo 'ERROR: GNU utils required for Mac. You may use homebrew to install them: brew install coreutils gnu-sed'
+		exit 1
+	}
+}
 
 # Directory of this script
-SCRIPT_DIR=$(cd "$(dirname "$0")"; pwd)
+SCRIPT_DIR=$(dirname $(readlink -f "$0"))
 # Directory of this project
 PROJECT_DIR=$(dirname ${SCRIPT_DIR})
 # target data

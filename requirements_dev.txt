@@ -1,2 +1,4 @@
 pytest
 black == 21.5b
+wheel
+pyinstaller
