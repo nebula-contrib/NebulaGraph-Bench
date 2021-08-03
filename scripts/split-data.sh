@@ -26,7 +26,7 @@ for folder in dynamic static;do
     cd ${DATA_DIR}/test_data/social_network/${folder}
     for f in $(ls -1 *_0_0.csv);
     do
-
+    echo "merge data: ${f}"
     dst=$(echo $f | sed 's/_0_0//')
     name=$(echo $dst | sed 's/.csv$//')
     mv $f $dst

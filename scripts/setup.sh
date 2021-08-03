@@ -1,7 +1,6 @@
 #!/bin/bash
 # setup dependency tools, including nebula-importer, k6.
 
-set -e
 shopt -s expand_aliases
 
 # cross-OS compatibility (greadlink, gsed, zcat are GNU implementations for OS X)
@@ -53,11 +52,11 @@ function setup_go(){
     x86_64)  arch=amd64;;
     aarch64) arch=arm64;;
   esac
-  wget -c https://golang.org/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz 
+  wget -t2 -c https://golang.org/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz 
 
   if [ $? != 0 ] ; then
-    wget -c https://golang.google.cn/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz
-    if [ $? !=0 ] ; then
+    wget -t2 -c https://golang.google.cn/dl/go${GOLANG_VERSION}.${os}-${arch}.tar.gz
+    if [ $? != 0 ] ; then
       echo "cannot download golang installation package, please install manually."
       exit 1
     fi
