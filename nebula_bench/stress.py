@@ -106,6 +106,14 @@ class StressFactory(object):
 
 
 class K6Stress(Stress):
+    def _update_read_config(self, scenario, kwargs):
+        kwargs["param"] = ",".join(["d[" + str(x) + "]" for x in scenario.csv_index])
+        return kwargs
+
+    def _update_insert_config(self, scenario, kwargs):
+        kwargs["csv_index"] = ",".join([str(x) for x in scenario.csv_index])
+        return kwargs
+
     def dump_config(self, scenario):
         assert issubclass(scenario, BaseScenario)
         name = scenario.name
@@ -118,14 +126,19 @@ class K6Stress(Stress):
             "output_path": "{}/output_{}.csv".format(self.output_folder, name),
             "nGQL": scenario.nGQL,
         }
+        if scenario.is_insert_scenario:
+            kwargs = self._update_insert_config(scenario, kwargs)
+            template_file = "k6_config_insert.js.j2"
+        else:
+            kwargs = self._update_read_config(scenario, kwargs)
+            template_file = "k6_config.js.j2"
 
-        kwargs["param"] = ",".join(["d[" + str(x) + "]" for x in scenario.csv_index])
         logger.info(
             "begin dump stress config, config file is {}".format(
                 "{}/{}.js".format(self.output_folder, name)
             )
         )
-        jinja_dump("k6_config.js.j2", "{}/{}.js".format(self.output_folder, name), kwargs)
+        jinja_dump(template_file, "{}/{}.js".format(self.output_folder, name), kwargs)
 
     def run(self):
         logger.info("run stress test in k6")

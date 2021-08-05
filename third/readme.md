@@ -64,7 +64,7 @@ docker-compose 中，配置了默认数据库为 `k6`。
 * 在 `.env` 中，配置 influxdb 的地址，如：`http://192.168.8.60:8086/k6`。
 * 登录 grafana，添加 influxdb 数据源。
 * 添加 dashboard，json 文件见 [k6_influxdb.json](./promethues/k6_influxdb.json)。
-* 执行压力测试，查看 grafana 的图。
+* 执行压力测试，查看 grafana 的面板。
 
 ## 效果
 

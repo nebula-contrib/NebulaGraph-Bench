@@ -145,6 +145,7 @@ class ScenarioMeta(type):
 
 class BaseScenario(metaclass=ScenarioMeta):
     abstract = True
+    is_insert_scenario = False
     nGQL: str
     stage: dict
     csv_path: str

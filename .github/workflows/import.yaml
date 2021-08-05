@@ -72,10 +72,7 @@ jobs:
         env:
           CGO_ENABLED: 0
         run: |
-          export GOPATH=$HOME/go
-          export GOBIN=$GOPATH/bin
-          export PATH=$PATH:$GOBIN
-          /bin/bash scripts/setup.sh
+          ./scripts/setup.sh
 
       - name: generate the data
         run: |

@@ -1,0 +1,56 @@
+import nebulaPool from 'k6/x/nebulagraph';
+import { check } from 'k6';
+import { Trend } from 'k6/metrics';
+import { sleep } from 'k6';
+
+var lantencyTrend = new Trend('latency');
+var responseTrend = new Trend('responseTime');
+// initial nebula connect pool
+var pool = nebulaPool.initWithSize("{{ address }}", 2000, 4000);
+
+// set csv strategy, 1 means each vu has a separate csv reader.
+pool.configCsvStrategy(1)
+
+// initial session for every vu
+var session = pool.getSession("{{ user }}", "{{ password }}")
+session.execute("USE {{ space }}")
+
+
+export function setup() {
+  // config csv file
+  pool.configCSV("{{ csv_path }}", "|", false)
+  // config output file, save every query information
+  pool.configOutput("{{ output_path }}")
+  sleep(1)
+}
+
+export default function (data) {
+  let ngql = '{{ nGQL }}'
+  let batches = []
+  let batchSize = 100
+  // batch size 100
+  for (let i = 0; i < batchSize; i++) {
+    let d = session.getData();
+    let values = []
+    let arr = [{{ csv_index }}]
+    arr.forEach(function(e){
+      let value = '"' + d[e] + '"'
+      values.push(value)
+    })
+
+    let batch = d[0] + ":(" + values.join(",") + ")"
+    batches.push(batch)
+  }
+  ngql = ngql + batches.join(',')
+  let response = session.execute(ngql)
+  check(response, {
+    "IsSucceed": (r) => r.isSucceed() === true
+  });
+  // add trend
+  lantencyTrend.add(response.getLatency());
+  responseTrend.add(response.getResponseTime());
+};
+
+export function teardown() {
+  pool.close()
+}
