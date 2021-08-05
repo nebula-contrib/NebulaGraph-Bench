@@ -44,7 +44,7 @@ prepare nebula tools.
 * [xk6-nebula](https://github.com/HarrisChu/xk6-nebula)
 
 ```bash
-/bin/bash scripts/setup.sh
+./scripts/setup.sh
 ```
 
 After compilation, it would put binaries in `scripts` folder.
