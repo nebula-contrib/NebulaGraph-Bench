@@ -1,9 +1,7 @@
 # -*- encoding: utf-8 -*-
-from os import pardir
 import sys
 import inspect
 from pathlib import Path
-import re
 
 import click
 
