@@ -118,13 +118,27 @@ python3 run.py stress run --help
 python3 run.py stress run 
 
 # run all scenarios with 10 virtual users, every scenario lasts 3 seconds.
-python3 run.py stress run -vu 10 -d 3
+python3 run.py stress run --args='-u 10 -d 3s'
 
 # list all stress test scenarios
 python3 run.py stress scenarios
 
 # run go.Go1Step scenarios with 10 virtual users, every scenario lasts 3 seconds.
-python3 run.py stress run -vu 10 -d 3 -scenario go.Go1Step
+python3 run.py stress run -scenario go.Go1Step --args='-u 10 -d 3s'
+
+# run go.Go1Step scenarios with special test stage.
+# ramping up from 0 to 10 vus in first 10 seconds, then run 10 vus in 30 seconds, 
+# then ramping up from 10 to 50 vus in 10 seconds.
+python3 run.py stress run -scenario go.Go1Step --args='-s 10s:10 -s 30s:10 -s 10s:50'
+
+# use csv output
+python3 run.py stress run -scenario go.Go1Step --args='-s 10s:10 -s 30s:10 -s 10s:50 -o csv=test.csv'
+```
+
+更多 k6 参数，请参考。
+
+```bash
+scripts/k6 run --help
 ```
 
 k6 config file, summary result and outputs are in `output` folder. e.g.

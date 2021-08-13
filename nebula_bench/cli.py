@@ -132,10 +132,6 @@ def stress():
     default="int",
     help="space vid type, values should be [int, string], default: int",
 )
-@click.option("-vu", default=100, help="concurrent virtual users, default: 100")
-@click.option(
-    "-d", "--duration", default=60, help="duration for every scenario, unit: second, default: 60"
-)
 @click.option("-scenario", default="all", help="run special scenario, e.g. go.Go1Step")
 @click.option("-c", "--controller", default="k6", help="using which test tool")
 @click.option(
@@ -144,8 +140,9 @@ def stress():
     is_flag=True,
     help="Dry run, just dump stress testing config file, default: False",
 )
+@click.option("--args", help="extend args for test tool")
 def run(
-    folder, address, user, password, space, vid_type, scenario, controller, vu, duration, dry_run
+    folder, address, user, password, space, vid_type, scenario, controller, args, dry_run
 ):
     stress = StressFactory.gen_stress(
         _type=controller,
@@ -156,8 +153,7 @@ def run(
         space=space,
         vid_type=vid_type,
         scenarios=scenario,
-        vu=vu,
-        duration=duration,
+        args = args,
         dry_run=dry_run,
     )
     stress.run()
