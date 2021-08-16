@@ -10,7 +10,14 @@ It only support nebula graph 2.0+ release.
 The main features:
 
 * Generate the LDBC dataset and then import into nebula-graph.
-* nebula-graph benchmark. (WIP)
+* Run load test with k6.
+
+## Dependency
+
+|   Nebula Bench    |     Nebua     | Nebula Importer |   K6 Plugin  |   ldbc_snb_datagen  |   Nebula-go    |
+|:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
+|       v0.2        |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
+|       master      |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
 
 ## How to use
 

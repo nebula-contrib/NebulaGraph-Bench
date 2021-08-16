@@ -33,8 +33,8 @@ function setup_nebula_importer(){
 }
 
 function setup_nebula_k6(){
-  git clone  --branch ${NEBULA_XK6_VERSION} https://github.com/HarrisChu/xk6-nebula ${TEMP_DIR}/xk6-nebula
-  cd ${TEMP_DIR}/xk6-nebula
+  git clone  --branch ${NEBULA_XK6_VERSION} https://github.com/vesoft-inc/k6-plugin ${TEMP_DIR}/k6-plugin
+  cd ${TEMP_DIR}/k6-plugin
   make build
   mv k6 ${PROJECT_DIR}/scripts/.
 }
