@@ -84,4 +84,4 @@ jobs:
 
       - name: run stress testing
         run: |
-          python3 run.py stress run -d 3
+          python3 run.py stress run --args='-d 3s'
