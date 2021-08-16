@@ -7,7 +7,14 @@
 主要功能:
 
 * 生产 LDBC 数据集并导入 nebula graph。
-* nebula-graph benchmark。 (未完成)
+* 用 k6 进行压测。
+
+## 工具依赖
+
+|   Nebula Bench    |     Nebua     | Nebula Importer |   K6 Plugin  |   ldbc_snb_datagen  |   Nebula-go    |
+|:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
+|       v0.2        |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
+|       master      |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
 
 ## 使用说明
 
@@ -178,8 +185,6 @@ awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
 因为一个查询有一个检查点，所以上面代表执行了 113778 个 query，所有都成功了。
 
 latency 的单位是 `us`。
-
-如果使用 Jmeter，暂时没有自动化操作，可以通过手动调整 Jmeter 来测试，具体参考 [jmx](ldbc/jmx/go_step.jmx) 和 [java](util/LdbcGoStep/src/main/java/vesoft/LdbcGoStep.java)。
 
 ## 更多
 
