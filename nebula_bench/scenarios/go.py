@@ -18,6 +18,7 @@ class Go2Step(BaseGoScenario):
     abstract = False
     nGQL = "GO 2 STEP FROM {} OVER KNOWS"
 
+
 class Go3Step(BaseGoScenario):
     abstract = False
     nGQL = "GO 3 STEP FROM {} OVER KNOWS"

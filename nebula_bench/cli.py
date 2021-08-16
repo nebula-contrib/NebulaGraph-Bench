@@ -97,29 +97,9 @@ def importer(folder, address, user, password, space, vid_type, dry_run):
     c = nc.import_space(dry_run)
     if c != 0:
         exit(c)
-    if not dry_run:
-        click.echo("begin space compact")
-        nc.compact()
-        click.echo("end space compact")
-    nc.release()
 
 
-@nebula.command(help="initial nebula graph, including create indexes")
-@common
-def init(folder, address, user, password, space):
-    nc = NebulaController(
-        data_folder=folder,
-        user=user,
-        password=password,
-        address=address,
-        space=space,
-        vid_type="int",
-    )
-
-    nc.init_space()
-
-
-@cli.group()
+@cli.group(help="stress testing")
 def stress():
     pass
 
@@ -157,8 +137,6 @@ def run(
         dry_run=dry_run,
     )
     stress.run()
-
-    pass
 
 
 @stress.command()
