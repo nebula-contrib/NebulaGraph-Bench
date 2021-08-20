@@ -15,9 +15,9 @@ The main features:
 ## Dependency
 
 |   Nebula Bench    |     Nebua     | Nebula Importer |   K6 Plugin  |   ldbc_snb_datagen  |   Nebula-go    |
-|:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
 |       v0.2        |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
-|       master      |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
+|       v1.0.0      |    v2.5.0     |     v2.5.0      |    v0.0.7    |       v0.3.3        |     v2.5.0     |
+|       master      |    v2.5.0     |     v2.5.0      |    v0.0.7    |       v0.3.3        |     v2.5.0     |
 
 ## How to use
 
