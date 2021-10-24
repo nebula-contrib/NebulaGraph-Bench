@@ -22,3 +22,11 @@ class Go2Step(BaseGoScenario):
 class Go3Step(BaseGoScenario):
     abstract = False
     nGQL = "GO 3 STEP FROM {} OVER KNOWS"
+
+class Go5Step(BaseGoScenario):
+    abstract = False
+    nGQL = "GO 5 STEP FROM {} OVER KNOWS"
+
+class Go10Step(BaseGoScenario):
+    abstract = False
+    nGQL = "GO 10 STEP FROM {} OVER KNOWS"

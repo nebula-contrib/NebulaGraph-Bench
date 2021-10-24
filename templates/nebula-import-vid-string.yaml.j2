@@ -12,7 +12,7 @@ clientSettings:
     address: {{ address }}
   postStart:
     commands: |
-      CREATE SPACE IF NOT EXISTS {{ space }}(PARTITION_NUM = 24, REPLICA_FACTOR = 3, vid_type = fixed_string(20));
+      CREATE SPACE IF NOT EXISTS {{ space }}(PARTITION_NUM = 24, REPLICA_FACTOR = 1, vid_type = fixed_string(20));
       USE {{ space }};
       {% for vertex in vertex_set -%}
           CREATE TAG IF NOT EXISTS `{{ vertex.name }}`(
