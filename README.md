@@ -179,6 +179,19 @@ or, just review the sumary result in stdout. e.g.
      vus_max..............: 100     min=100       max=100
 ```
 
+* `checks`, one check per iteration, verify `isSucceed` by default.
+* `data_received` and `data_sent`, used by HTTP requests, useless for nebula.
+* `iteration_duration`, time consuming for every iteration.
+* `latency`, time consuming in nebula server.
+* `responseTime`, time consuming in client.
+* `vus`, concurrent virtual users.
+
+In general
+
+iteration_duration = responseTime + (time consuming for read data from csv)
+
+responseTime = latency + (time consuming for network) + (client decode)
+
 As one iteration has one check, it means run `113778` queries.
 
 The unit of latency is `us`.
