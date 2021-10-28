@@ -183,6 +183,19 @@ awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
      vus_max..............: 100     min=100       max=100
 ```
 
+* `checks`，每次执行有一个检查点，默认是检查服务端返回的 `isSucceed`。
+* `data_received` 和 `data_sent`，是 k6 工具自带的，对 nebula 用处不大。
+* `iteration_duration`，每次执行的总时间。
+* `latency`，服务端耗时。
+* `responseTime`，客户端耗时。
+* `vus`，并发的用户数
+
+大体来说
+
+iteration_duration = responseTime + (客户端从 csv 读数据的耗时)
+
+responseTime = latency + (网络传输的耗时) + (客户端解码的耗时)
+
 因为一个查询有一个检查点，所以上面代表执行了 113778 个 query，所有都成功了。
 
 latency 的单位是 `us`。
