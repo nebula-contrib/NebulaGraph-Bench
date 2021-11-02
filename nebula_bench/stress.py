@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import sys
 import inspect
+import copy
 from pathlib import Path
 
 import click
@@ -182,6 +183,7 @@ class K6Stress(Stress):
             params["--out"] = ["influxdb={}".format(setting.INFLUXDB_URL)]
 
         for scenario in self.scenarios:
+            _params = copy.copy(params)
             self.dump_config(scenario)
             if run_with_stage:
                 command = [
@@ -200,12 +202,12 @@ class K6Stress(Stress):
                     str(duration),
                 ]
 
-            if "--summary-export" not in params:
-                params["--summary-export"] = [
+            if "--summary-export" not in _params:
+                _params["--summary-export"] = [
                     "{}/result_{}.json".format(self.output_folder, scenario.name)
                 ]
 
-            for param, values in params.items():
+            for param, values in _params.items():
                 if values is None:
                     command.append(param)
                 else:
