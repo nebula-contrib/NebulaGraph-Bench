@@ -13,7 +13,7 @@
 
 组件使用
 
-* Promethues
+* Prometheus
 * Node exporter
 * Process exporter
 
@@ -26,16 +26,16 @@
 
 ## 部署步骤
 
-### Promethues
+### Prometheus
 
-* 将 promethues 复制到任意一个节点
+* 将 prometheus 复制到任意一个节点
 * prometheus.yml 中，设置要监控的 nebula 节点，默认 node exporter 端口 9100，process exporter 端口 9256，然后启动 docker-compose。
 
 ```bash
 docker-compose up -d
 ```
 
-默认 promethues 的数据保留 15 天，如果需要更改，请自行修改 docker-compose 中 `--storage.tsdb.retention=15d'` 配置。
+默认 prometheus 的数据保留 15 天，如果需要更改，请自行修改 docker-compose 中 `--storage.tsdb.retention=15d'` 配置。
 
 ### Exporter
 
@@ -48,7 +48,7 @@ docker-compose up -d
 
 ### Grafana
 
-为了方便，grafana 默认放在 promethues 的 docker-compose.yml 中，启动 prometheus 时，会自动启动。
+为了方便，grafana 默认放在 prometheus 的 docker-compose.yml 中，启动 prometheus 时，会自动启动。
 
 * 登录 grafana，默认端口 3000，用户名/密码是: admin/admin。
 * 添加 prometheus 数据源。
@@ -58,12 +58,12 @@ docker-compose up -d
 
 ### InfluxDB
 
-为了方便，influxdb 默认放在 promethues 的 docker-compose.yml 中，启动 prometheus 时，会自动启动。
+为了方便，influxdb 默认放在 prometheus 的 docker-compose.yml 中，启动 prometheus 时，会自动启动。
 docker-compose 中，配置了默认数据库为 `k6`。
 
 * 在 `.env` 中，配置 influxdb 的地址，如：`http://192.168.8.60:8086/k6`。
 * 登录 grafana，添加 influxdb 数据源。
-* 添加 dashboard，json 文件见 [k6_influxdb.json](./promethues/k6_influxdb.json)。
+* 添加 dashboard，json 文件见 [k6_influxdb.json](./prometheus/k6_influxdb.json)。
 * 执行压力测试，查看 grafana 的面板。
 
 ## 效果
