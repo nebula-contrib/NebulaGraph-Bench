@@ -19,9 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Check spelling
-        uses: check-spelling/check-spelling@v0.0.20-alpha3
-
       - name: Cache the Maven packages to speed up build
         uses: actions/cache@v2
         with:
