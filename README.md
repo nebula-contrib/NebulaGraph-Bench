@@ -63,7 +63,7 @@ After compilation, it would put binaries in `scripts` folder.
 python3 run.py data 
 ```
 
-It would download the Hadoop automaticly, build the datagen jar, and then generate ldbc data.
+It would download the Hadoop automatically, build the datagen jar, and then generate ldbc data.
 
 To import the data more easier, split the file header to a `header.csv` file.
 The result files in `${PWD}/target/data/test_data/`
@@ -159,7 +159,7 @@ jq .metrics.latency output/result_Go1Step.json
 awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
 ```
 
-or, just review the sumary result in stdout. e.g.
+or, just review the summary result in stdout. e.g.
 
 ```bash
      ✓ IsSucceed
@@ -178,6 +178,19 @@ or, just review the sumary result in stdout. e.g.
      vus..................: 100     min=0         max=100
      vus_max..............: 100     min=100       max=100
 ```
+
+* `checks`, one check per iteration, verify `isSucceed` by default.
+* `data_received` and `data_sent`, used by HTTP requests, useless for nebula.
+* `iteration_duration`, time consuming for every iteration.
+* `latency`, time consuming in nebula server.
+* `responseTime`, time consuming in client.
+* `vus`, concurrent virtual users.
+
+In general
+
+iteration_duration = responseTime + (time consuming for read data from csv)
+
+responseTime = latency + (time consuming for network) + (client decode)
 
 As one iteration has one check, it means run `113778` queries.
 
