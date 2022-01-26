@@ -1,5 +1,6 @@
 import getopt
 import os
+import re
 import sys
 import threading
 import pandas as pd
@@ -16,18 +17,20 @@ def handler_data_once():
     lock.release()
     print('%s handler %s.' % (threading.current_thread().name, file))
     if(os.path.isfile(_csv_dir+file[:-4]+'_header.csv')):
-        pd_header_file = pd.read_csv(_csv_dir+file[:-4]+'_header.csv', sep='|')
-        df_header = pd.DataFrame(pd_header_file)
+        pd_header_csv = pd.read_csv(_csv_dir+file[:-4]+'_header.csv', sep='|')
+        df_header = pd.DataFrame(pd_header_csv)
         if os.path.exists(_csv_dir+file+'.copy'):
             os.remove(_csv_dir+file+'.copy')
-        pd_file = pd.read_csv(_csv_dir+file, sep='|',
-                              header=None, chunksize=100000)
+        pd_csv = pd.read_csv(_csv_dir+file, sep='|',
+                             header=None, chunksize=100000)
         # handler header csv
         name_map = {}
         date_list = []
         for i in range(len(df_header.columns)):
             if df_header.columns[i].endswith('.id'):
                 name_map[i] = df_header.columns[i][:-3].lower()
+            elif df_header.columns[i].endswith('.id.1'):
+                name_map[i] = df_header.columns[i][:-5].lower()
             elif df_header.columns[i] == 'id':
                 name_map[i] = os.path.splitext(file)[0].split('/')[-1]
             elif df_header.columns[i].endswith('Date'):
@@ -44,7 +47,7 @@ def handler_data_once():
         df_header.to_csv(_csv_dir+file[:-4] +
                          '_header.csv.copy', index=False, sep='|')
         # handler data csv in chunk
-        for df in pd_file:
+        for df in pd_csv:
             for key in name_map:
                 df[key] = df[key].astype(str)
                 df[key] = df[key].apply(lambda x: name_map[key]+'-'+x)
@@ -61,6 +64,35 @@ def handler_data():
             break
         lock.release()
         handler_data_once()
+
+
+def back_handler():
+    print('start back handler')
+    target_need_fix_title = ['static/place_isPartOf_place_header.csv.copy',
+                             'dynamic/person_knows_person_header.csv.copy',
+                             'dynamic/comment_replyOf_comment_header.csv']
+    # remove duplicate columns .1
+    for dir in target_need_fix_title:
+        with open(_csv_dir+dir, "r+") as fr:
+            with open(_csv_dir+dir+'1', "w") as fw:
+                fw.writelines(re.sub('id\.1', 'id', fr.readline()))
+                fw.writelines(fr.readlines())
+                os.remove(_csv_dir+dir)
+                os.rename(_csv_dir+dir+'1', _csv_dir+dir)
+    # split place
+    place_header_csv = pd.read_csv(
+        _csv_dir+'static/place_header.csv.copy', sep='|')
+    place_csv = pd.read_csv(_csv_dir+'static/place.csv.copy', sep='|',
+                            header=None, names=place_header_csv.columns)
+    df = pd.DataFrame(place_csv)
+    grouped = df.groupby('type')
+    for name, group in grouped:
+        group[0:10].to_csv(_csv_dir+'static/'+name +
+                           '_header.csv.copy', sep='|', index=False)
+        group.to_csv(_csv_dir+'static/'+name+'.csv.copy', index=False,
+                     sep='|', header=None, mode='a')
+    os.remove(_csv_dir+'static/place.csv.copy')
+    os.remove(_csv_dir+'static/place_header.csv.copy')
 
 
 if __name__ == "__main__":
@@ -92,4 +124,5 @@ if __name__ == "__main__":
         thread_group.append(t)
     for th in thread_group:
         th.join()
+    back_handler()
     print('all task done! please run copy-data.py to recover csv file')
