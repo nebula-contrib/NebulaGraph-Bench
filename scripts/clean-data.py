@@ -70,7 +70,8 @@ def back_handler():
     print('start back handler')
     target_need_fix_title = ['static/place_isPartOf_place_header.csv.copy',
                              'dynamic/person_knows_person_header.csv.copy',
-                             'dynamic/comment_replyOf_comment_header.csv']
+                             'dynamic/comment_replyOf_comment_header.csv.copy',
+                             'static/tagclass_isSubclassOf_tagclass_header.csv.copy']
     # remove duplicate columns .1
     for dir in target_need_fix_title:
         with open(_csv_dir+dir, "r+") as fr:
@@ -87,8 +88,8 @@ def back_handler():
     df = pd.DataFrame(place_csv)
     grouped = df.groupby('type')
     for name, group in grouped:
-        group[0:10].to_csv(_csv_dir+'static/'+name +
-                           '_header.csv.copy', sep='|', index=False)
+        group[0:9].to_csv(_csv_dir+'static/'+name +
+                          '_header.csv.copy', sep='|', index=False)
         group.to_csv(_csv_dir+'static/'+name+'.csv.copy', index=False,
                      sep='|', header=None, mode='a')
     os.remove(_csv_dir+'static/place.csv.copy')
