@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import abc
-import maya
 from pathlib import Path
 import enum
 
@@ -76,12 +75,13 @@ class Parser(object):
         if data.isnumeric():
             return PropTypeEnum.INT.value
         else:
-            try:
-                maya.parse(data)
-                return PropTypeEnum.DateTime.value
-            except Exception as e:
-                # not a valid date
-                pass
+            # nebula graph doesn't support datetime("2012-01-20T19:49:25.982+0000")
+            # try:
+            #     maya.parse(data)
+            #     return PropTypeEnum.DateTime.value
+            # except Exception as e:
+            #     # not a valid date
+            #     pass
             return PropTypeEnum.String.value
 
     def parse_vertex(self, file_path):
