@@ -3,9 +3,11 @@ on:
   push:
     branches: [master]
   pull_request:
+    types: [synchronize, reopened]
+    
     branches:
       - master
-      - "v[0-9]+.*"
+      - "release-[0-9]+.*"
 
 jobs:
   build:
