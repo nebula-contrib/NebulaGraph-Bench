@@ -63,8 +63,10 @@ jobs:
           git clone https://github.com/vesoft-inc/nebula-docker-compose.git
           pushd nebula-docker-compose/
           cp ../../e2e/nebula/docker-compose.yaml .
+          cp ../../e2e/nebula/env .env
           docker-compose up -d
           sleep 5
+          docker-compose logs
           popd
           popd
 

@@ -57,7 +57,7 @@ sed -i "s/interactive.*/interactive.${scaleFactor}/g" params.ini && \
 export HADOOP_HOME=${HADOOP_HOME} && \
 export LDBC_SNB_DATAGEN_HOME=`pwd`  && \
 sh run.sh && \
-rm -rf ${DATA_DIR}/test_data && \
 mv test_data ${DATA_DIR}/.
 
 echo "Finish"
+

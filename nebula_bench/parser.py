@@ -11,6 +11,7 @@ class PropTypeEnum(enum.Enum):
     INT = "int"
     DateTime = "datetime"
     String = "string"
+    Timestamp = "timestamp"
 
 
 class Base(object):
@@ -74,11 +75,12 @@ class Parser(object):
         if data.isnumeric():
             return PropTypeEnum.INT.value
         else:
-            # importer does not support datetime yet.
+            # nebula graph doesn't support datetime("2012-01-20T19:49:25.982+0000")
             # try:
-            #     parser.parse(data)
+            #     maya.parse(data)
             #     return PropTypeEnum.DateTime.value
-            # except parser.ParserError as e:
+            # except Exception as e:
+            #     # not a valid date
             #     pass
             return PropTypeEnum.String.value
 
@@ -99,7 +101,9 @@ class Parser(object):
 
         assert len(header_list) == len(
             data_list
-        ), "header length should be equle to data length, error file is {}".format(file_path)
+        ), "header length should be equle to data length, error file is {}".format(
+            file_path
+        )
 
         for index, h in enumerate(header_list):
             if h.strip().lower() == "id":
@@ -141,7 +145,9 @@ class Parser(object):
 
         assert len(header_list) == len(
             data_list
-        ), "header length should be equle to data length, error file is {}".format(file_path)
+        ), "header length should be equle to data length, error file is {}".format(
+            file_path
+        )
 
         flag = True
         for index, h in enumerate(header_list):
@@ -215,7 +221,9 @@ class NebulaDumper(Dumper):
         if vid_type == "int":
             self.template_file = self.template_file or "nebula-import-vid-int.yaml.j2"
         elif vid_type == "string":
-            self.template_file = self.template_file or "nebula-import-vid-string.yaml.j2"
+            self.template_file = (
+                self.template_file or "nebula-import-vid-string.yaml.j2"
+            )
 
         kwargs["vertex_list"] = self._parser.vertex_list
         kwargs["edge_list"] = self._parser.edge_list
