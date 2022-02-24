@@ -2,6 +2,7 @@
 import abc
 from pathlib import Path
 import enum
+import datetime
 
 from nebula_bench import setting
 from nebula_bench.utils import jinja_dump
@@ -75,13 +76,13 @@ class Parser(object):
         if data.isnumeric():
             return PropTypeEnum.INT.value
         else:
-            # nebula graph doesn't support datetime("2012-01-20T19:49:25.982+0000")
-            # try:
-            #     maya.parse(data)
-            #     return PropTypeEnum.DateTime.value
-            # except Exception as e:
-            #     # not a valid date
-            #     pass
+            try:
+                datetime_format = "%Y-%m-%dT%H:%M:%S"
+                datetime.datetime.strptime(data, datetime_format)
+                return PropTypeEnum.DateTime.value
+            except Exception as e:
+                # not a valid date
+                pass
             return PropTypeEnum.String.value
 
     def parse_vertex(self, file_path):
