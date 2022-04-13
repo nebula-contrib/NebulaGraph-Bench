@@ -86,7 +86,6 @@ files:
         dstVID:
           index: {{ edge.dst_index }}
           type: int
-          prefix: {{ edge.dst_prefix }}
         props:
           {%- for prop in edge.prop_list %}
           - name: {{ prop.name }}
