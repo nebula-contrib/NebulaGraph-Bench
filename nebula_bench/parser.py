@@ -7,6 +7,19 @@ import datetime
 from nebula_bench import setting
 from nebula_bench.utils import jinja_dump
 
+prefix_map = {
+    "comment": "c-",
+    "forum": "f-",
+    "organisation": "o-",
+    "person": "p-",
+    "place": "l-",
+    "post": "s-",
+    "tag": "t-",
+    "tagclass": "g-",
+    "emailaddress": "ea-",
+    "language": "lg-",
+}
+
 
 class PropTypeEnum(enum.Enum):
     INT = "int"
@@ -43,6 +56,7 @@ class Vertex(Base):
         Base.__init__(self, name, index)
         self.path = None
         self.prop_list = []
+        self.prefix = None
 
 
 class Edge(Base):
@@ -50,6 +64,7 @@ class Edge(Base):
         Base.__init__(self, name, index)
         self.src_index = self.dst_index = None
         self.src_name = self.dst_name = None
+        self.src_prefix = self.dst_prefix = None
         self.prop_list = []
 
 
@@ -91,6 +106,7 @@ class Parser(object):
 
         vertex = Vertex(name)
         vertex.path = str(file_path.absolute())
+        vertex.prefix = prefix_map.get(name.lower(), "")
 
         header_path = Path(file_path.parent / (file_name + "_header.csv"))
         with open(str(header_path.absolute()), "r") as fl:
@@ -157,9 +173,11 @@ class Parser(object):
                 flag = not flag
                 name = h.rsplit(".id", 1)[0].lower()
                 edge.src_name, edge.src_index = name, index
+                edge.src_prefix = prefix_map.get(name, "")
             elif h.lower() == dst_vertex.lower() + ".id":
                 name = h.rsplit(".id", 1)[0].lower()
                 edge.dst_name, edge.dst_index = name, index
+                edge.dst_prefix = prefix_map.get(name, "")
 
             else:
                 p = Prop()
@@ -219,6 +237,7 @@ class NebulaDumper(Dumper):
 
     def dump(self, *args, **kwargs):
         vid_type = kwargs.pop("vid_type", "int")
+        enable_prefix = kwargs.pop("enable_prefix", False)
         if vid_type == "int":
             self.template_file = self.template_file or "nebula-import-vid-int.yaml.j2"
         elif vid_type == "string":
@@ -230,6 +249,7 @@ class NebulaDumper(Dumper):
         kwargs["edge_list"] = self._parser.edge_list
         kwargs["vertex_set"] = self._parser.vertex_set
         kwargs["edge_set"] = self._parser.edge_set
+        kwargs["enable_prefix"] = enable_prefix
 
         jinja_dump(self.template_file, self.result_file, kwargs)
         return self.result_file

@@ -54,6 +54,7 @@ files:
         vid:
           index: {{ vertex.index }}
           type: int
+
         tags:
           - name: {{ vertex.name }}
             props:
@@ -81,9 +82,11 @@ files:
         srcVID:
           index: {{ edge.src_index }}
           type: int
+
         dstVID:
           index: {{ edge.dst_index }}
           type: int
+          prefix: {{ edge.dst_prefix }}
         props:
           {%- for prop in edge.prop_list %}
           - name: {{ prop.name }}
