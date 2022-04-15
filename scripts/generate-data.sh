@@ -59,7 +59,7 @@ echo "ldbc.snb.datagen.util.formatter.StringDateFormatter.dateTimeFormat:yyyy-MM
 # set this to the Hadoop 3.2.1 directory
 export HADOOP_HOME=${HADOOP_HOME} && \
 export LDBC_SNB_DATAGEN_HOME=`pwd`  && \
-sh run.sh && \
+bash run.sh && \
 rm -rf ${DATA_DIR}/test_data && \
 mv test_data ${DATA_DIR}/.
 
