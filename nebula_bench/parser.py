@@ -16,8 +16,8 @@ prefix_map = {
     "post": "s-",
     "tag": "t-",
     "tagclass": "g-",
-    "emailaddress": "ea-",
-    "language": "lg-",
+    "emailaddress": "e-",
+    "language": "u-",
 }
 
 
