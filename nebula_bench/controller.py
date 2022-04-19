@@ -9,7 +9,9 @@ from nebula_bench import utils
 
 
 class BaseController(object):
-    def __init__(self, data_folder=None, space=None, user=None, password=None, address=None):
+    def __init__(
+        self, data_folder=None, space=None, user=None, password=None, address=None
+    ):
         self.workspace_path = setting.WORKSPACE_PATH
         self.data_folder = data_folder or setting.DATA_FOLDER
         self.data_folder = Path(self.data_folder)
@@ -21,7 +23,14 @@ class BaseController(object):
 
 class NebulaController(BaseController):
     def __init__(
-        self, data_folder=None, space=None, user=None, password=None, address=None, vid_type=None
+        self,
+        data_folder=None,
+        space=None,
+        user=None,
+        password=None,
+        address=None,
+        vid_type=None,
+        enable_prefix=None,
     ):
         super().__init__(
             data_folder=data_folder,
@@ -31,6 +40,7 @@ class NebulaController(BaseController):
             address=address,
         )
         self.vid_type = vid_type or "int"
+        self.enable_prefix = enable_prefix
 
     def import_space(self, dry_run=False):
         result_file = self.dump_nebula_importer()
@@ -40,10 +50,15 @@ class NebulaController(BaseController):
         return 0
 
     def dump_nebula_importer(self):
-        _type = "int64" if self.vid_type == "int" else "fixed_string(20)"
+        kwargs = {}
+        if self.enable_prefix and self.vid_type == 'int':
+            raise Exception("must use prefix with vid type string")
+        else:
+            kwargs["enable_prefix"] = self.enable_prefix
+
         p = parser.Parser(parser.NebulaDumper, self.data_folder)
         dumper = p.parse()
-        kwargs = {}
+
         kwargs["space"] = self.space
         kwargs["user"] = self.user
         kwargs["password"] = self.password
@@ -85,7 +100,9 @@ class StressController(BaseController):
                 class_name=scenario,
             )
         else:
-            return utils.load_class(package_name, load_all=True, base_class=BaseScenario)
+            return utils.load_class(
+                package_name, load_all=True, base_class=BaseScenario
+            )
 
     def run(self, nebula_scenario):
         result_folder = "target/result"

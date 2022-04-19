@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from email.policy import default
 import click
 
 from nebula_bench import setting
@@ -12,11 +13,17 @@ SH_COMMAND = "/bin/bash"
 
 
 def common(f):
-    f = click.option("-f", "--folder", help="ldbc data folder, default: target/data/test_data")(f)
+    f = click.option(
+        "-f", "--folder", help="ldbc data folder, default: target/data/test_data"
+    )(f)
 
-    f = click.option("-a", "--address", help="Nebula Graph address, default: 127.0.0.1:9669")(f)
+    f = click.option(
+        "-a", "--address", help="Nebula Graph address, default: 127.0.0.1:9669"
+    )(f)
     f = click.option("-u", "--user", help="Nebula Graph address, default: root")(f)
-    f = click.option("-p", "--password", help="Nebula Graph address, default: nebula")(f)
+    f = click.option("-p", "--password", help="Nebula Graph address, default: nebula")(
+        f
+    )
     f = click.option(
         "-s",
         "--space",
@@ -32,8 +39,12 @@ def cli():
 
 
 @cli.command(help="generate and split ldbc data")
-@click.option("-s", "--scale-factor", default="1", help="scale factor for ldbc, default: 1")
-@click.option("-og", "--only-generate", default=False, is_flag=True, help="only generate data")
+@click.option(
+    "-s", "--scale-factor", default="1", help="scale factor for ldbc, default: 1"
+)
+@click.option(
+    "-og", "--only-generate", default=False, is_flag=True, help="only generate data"
+)
 @click.option(
     "-os",
     "--only-split",
@@ -69,10 +80,14 @@ def nebula():
 @click.option("-a", "--address", help="Nebula Graph address, default: 127.0.0.1:9669")
 @click.option("-u", "--user", help="Nebula Graph address, default: root")
 @click.option("-p", "--password", help="Nebula Graph address, default: nebula")
-@click.option("-k", "--keep", help="keep spaces that not be dropped, e.g. space1,space2")
+@click.option(
+    "-k", "--keep", help="keep spaces that not be dropped, e.g. space1,space2"
+)
 def clean(address, user, password, keep):
     sc = NebulaController(user=user, password=password, address=address)
-    value = click.confirm("Will delete all spaces in Nebula Graph. Continue?", abort=True)
+    value = click.confirm(
+        "Will delete all spaces in Nebula Graph. Continue?", abort=True
+    )
     sc.clean_spaces(keep)
 
 
@@ -91,9 +106,18 @@ def clean(address, user, password, keep):
     is_flag=True,
     help="Dry run, just dump the import config file, default: False",
 )
-def importer(folder, address, user, password, space, vid_type, dry_run):
+@click.option(
+    "-p",
+    "--enable-prefix",
+    default=False,
+    is_flag=True,
+    help="enable add prefix in vid, vid type should be string",
+)
+def importer(folder, address, user, password, space, vid_type, enable_prefix, dry_run):
     assert vid_type in ["int", "string"], 'the vid type should be "ini" or "string" '
-    nc = NebulaController(folder, space, user, password, address, vid_type)
+    nc = NebulaController(
+        folder, space, user, password, address, vid_type, enable_prefix
+    )
     c = nc.import_space(dry_run)
     if c != 0:
         exit(c)
@@ -122,7 +146,16 @@ def stress():
 )
 @click.option("--args", help="extend args for test tool")
 def run(
-    folder, address, user, password, space, vid_type, scenario, controller, args, dry_run
+    folder,
+    address,
+    user,
+    password,
+    space,
+    vid_type,
+    scenario,
+    controller,
+    args,
+    dry_run,
 ):
     stress = StressFactory.gen_stress(
         _type=controller,
@@ -133,7 +166,7 @@ def run(
         space=space,
         vid_type=vid_type,
         scenarios=scenario,
-        args = args,
+        args=args,
         dry_run=dry_run,
     )
     stress.run()
