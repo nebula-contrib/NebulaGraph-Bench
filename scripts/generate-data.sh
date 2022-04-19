@@ -64,4 +64,3 @@ rm -rf ${DATA_DIR}/test_data && \
 mv test_data ${DATA_DIR}/.
 
 echo "Finish"
-
