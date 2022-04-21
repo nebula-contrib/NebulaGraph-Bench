@@ -202,3 +202,31 @@ The unit of latency is `us`.
 * The file with `aaa_xxYY_bbb` format, like `comment_hasTag_tag`, should be an edge, and the edge name shoud be `XX_YY`. Keep the same format with [ldbc_snb_interactive](https://github.com/ldbc/ldbc_snb_interactive/blob/main/cypher/queries/interactive-complex-1.cypher)
 * Otherwise it should be a vertex tag.
 * Different entity types might have same ID (e.g. Forum and Post).
+
+LDBC schema
+
+```bash
+CREATE TAG IF NOT EXISTS `Post`(`imageFile` string,`creationDate` datetime,`locationIP` string,`browserUsed` string,`language` string,`content` string,`length` int);
+CREATE TAG IF NOT EXISTS `Tag`(`name` string,`url` string);
+CREATE TAG IF NOT EXISTS `Tagclass`(`name` string,`url` string);
+CREATE TAG IF NOT EXISTS `Organisation`(`type` string,`name` string,`url` string);
+CREATE TAG IF NOT EXISTS `Place`(`name` string,`url` string,`type` string);
+CREATE TAG IF NOT EXISTS `Person`(`firstName` string,`lastName` string,`gender` string,`birthday` string,`creationDate` datetime,`locationIP` string,`browserUsed` string);
+CREATE TAG IF NOT EXISTS `Forum`(`title` string,`creationDate` datetime);
+CREATE TAG IF NOT EXISTS `Comment`(`creationDate` datetime,`locationIP` string,`browserUsed` string,`content` string,`length` int);
+CREATE EDGE IF NOT EXISTS `HAS_CREATOR`();
+CREATE EDGE IF NOT EXISTS `REPLY_OF`();
+CREATE EDGE IF NOT EXISTS `STUDY_AT`(`classYear` int);
+CREATE EDGE IF NOT EXISTS `WORK_AT`(`workFrom` int);
+CREATE EDGE IF NOT EXISTS `HAS_MODERATOR`();
+CREATE EDGE IF NOT EXISTS `LIKES`(`creationDate` datetime);
+CREATE EDGE IF NOT EXISTS `HAS_MEMBER`(`joinDate` datetime);
+CREATE EDGE IF NOT EXISTS `IS_PART_OF`();
+CREATE EDGE IF NOT EXISTS `CONTAINER_OF`();
+CREATE EDGE IF NOT EXISTS `HAS_INTEREST`();
+CREATE EDGE IF NOT EXISTS `IS_SUBCLASS_OF`();
+CREATE EDGE IF NOT EXISTS `HAS_TAG`();
+CREATE EDGE IF NOT EXISTS `IS_LOCATED_IN`();
+CREATE EDGE IF NOT EXISTS `HAS_TYPE`();
+CREATE EDGE IF NOT EXISTS `KNOWS`(`creationDate` datetime);
+```
