@@ -50,7 +50,7 @@ sudo apt-get install -y \
      wget \
      python3-pip \
      python \
-     java-1.8.0-openjdk \
+     openjdk-8-jdk \
      maven 
 
 export JAVA_HOME=/usr/lib/jvm/default-java/
