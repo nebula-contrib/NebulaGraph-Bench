@@ -22,6 +22,8 @@
 
 ### 安装准备
 
+#### Centos7
+
 ```bash
 sudo yum install -y git \
                     make \
@@ -36,6 +38,20 @@ sudo yum install -y git \
                     maven 
 
 
+```
+
+#### Ubuntu
+
+```bash
+sudo apt-get install -y \
+     git \
+     wget \
+     python3-pip \
+     python \
+     java-1.8.0-openjdk \
+     maven 
+
+export JAVA_HOME=/usr/lib/jvm/default-java/
 ```
 
 ```bash
