@@ -25,6 +25,8 @@ The main features:
 
 ### prepare
 
+#### Centos7
+
 ```bash
 sudo yum install -y git \
                     make \
@@ -38,6 +40,20 @@ sudo yum install -y git \
                     java-1.8.0-openjdk \
                     maven 
 
+```
+
+#### Ubuntu
+
+```bash
+sudo apt-get install -y \
+     git \
+     wget \
+     python3-pip \
+     python \
+     openjdk-8-jdk \
+     maven 
+
+export JAVA_HOME=/usr/lib/jvm/default-java/
 ```
 
 ```bash
