@@ -16,7 +16,8 @@
 |       v0.2        |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
 |       v1.0.0      |    v2.5.0     |     v2.5.0      |    v0.0.7    |       v0.3.3        |     v2.5.0     |
 |       v1.1.0      |    v3.0.0     |     v3.0.0      |    v0.0.9    |       v0.3.3        |     v3.0.0     |
-|       master      |    nightly    |     master      |    master    |       v0.3.3        |     master     |
+|       v1.2.0      |    v3.1.0     |     v3.1.0      |    v1.0.0    |       v0.3.3        |     NONE       |
+|       master      |    nightly    |     master      |    master    |       v0.3.3        |     NONE       |
 
 ## 使用说明
 
