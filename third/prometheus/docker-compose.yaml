@@ -28,7 +28,7 @@ services:
     restart: always
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:7.5.11
     user: root
     depends_on:
       - prometheus
