@@ -67,7 +67,7 @@ python3 run.py --help
 安装 golang，然后编译相关工具。
 
 * [nebula-importer](https://github.com/vesoft-inc/nebula-importer)
-* [xk6-nebula](https://github.com/HarrisChu/xk6-nebula)
+* [xk6-nebula](https://github.com/vesoft-inc/k6-plugin)
 
 ```bash
 /bin/bash scripts/setup.sh
