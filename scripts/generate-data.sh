@@ -55,7 +55,7 @@ cd ${DATA_DIR}/ldbc_snb_datagen && \
 sed -i "s/interactive.*/interactive.${scaleFactor}/g" params.ini && \
 # datetime format
 sed -i "s/ldbc.snb.datagen.util.formatter.StringDateFormatter.dateTimeFormat.*//g" params.ini && \
-echo "ldbc.snb.datagen.util.formatter.StringDateFormatter.dateTimeFormat:yyyy-MM-dd'T'HH:mm:ss" >> params.ini && \
+echo "ldbc.snb.datagen.util.formatter.StringDateFormatter.dateTimeFormat:yyyy-MM-dd'T'HH:mm:ss.SSS" >> params.ini && \
 # set this to the Hadoop 3.2.1 directory
 export HADOOP_HOME=${HADOOP_HOME} && \
 export LDBC_SNB_DATAGEN_HOME=`pwd`  && \
