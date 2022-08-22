@@ -15,6 +15,13 @@ pool.configCsvStrategy(1)
 var session = pool.getSession("{{ user }}", "{{ password }}")
 session.execute("USE {{ space }}")
 
+String.prototype.format = function () {
+  var formatted = this;
+  for (var arg in arguments) {
+    formatted = formatted.replace("{}", arguments[arg]);
+  }
+  return formatted;
+};
 
 export function setup() {
   // config csv file
@@ -31,15 +38,9 @@ export default function (data) {
   // batch size 100
   for (let i = 0; i < batchSize; i++) {
     let d = session.getData();
-    let values = []
-    let arr = [{{ csv_index }}]
-    arr.forEach(function(e){
-      let value = '"' + d[e] + '"'
-      values.push(value)
-    })
-
-    let batch = d[0] + ":(" + values.join(",") + ")"
-    batches.push(batch)
+    // d[0] means the first column data in the csv file
+    let value =  '{{ value }}'.format({{ param }})
+    batches.push(value)
   }
   ngql = ngql + batches.join(',')
   let response = session.execute(ngql)

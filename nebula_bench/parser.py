@@ -92,11 +92,12 @@ class Parser(object):
             return PropTypeEnum.INT.value
         else:
             try:
-                datetime_format = "%Y-%m-%dT%H:%M:%S"
+                datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
                 datetime.datetime.strptime(data, datetime_format)
                 return PropTypeEnum.DateTime.value
             except Exception as e:
                 # not a valid date
+                # print("warning: cannot parse the datetime, using string, exception: "+str(e))
                 pass
             return PropTypeEnum.String.value
 
