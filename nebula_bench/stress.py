@@ -94,7 +94,8 @@ class K6Stress(Stress):
         return kwargs
 
     def _update_insert_config(self, scenario, kwargs):
-        kwargs["csv_index"] = ",".join([str(x) for x in scenario.csv_index])
+        kwargs["value"] = scenario.value
+        kwargs["param"] = ",".join(["d[" + str(x) + "]" for x in scenario.csv_index])
         return kwargs
 
     def dump_config(self, scenario):
