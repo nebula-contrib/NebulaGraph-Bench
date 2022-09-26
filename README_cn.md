@@ -1,8 +1,8 @@
 # nebula-bench
 
-`Nebula-Bench` 用于测试 nebula-graph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
+`Nebula-Bench` 用于测试 NebulaGraph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
 
-当前只适用于 nebula graph v2.0 以上版本。
+当前只适用于 NebulaGraph v2.0 以上版本。
 
 主要功能:
 
@@ -62,7 +62,7 @@ pip3 install --user -r requirements.txt
 python3 run.py --help
 ```
 
-准备 nebula graph 的工具。
+准备 NebulaGraph 的工具。
 
 安装 golang，然后编译相关工具。
 
@@ -116,7 +116,7 @@ python3 run.py nebula importer
 会根据 header 文件，自动生成 importer 的配置文件，然后运行 importer 导入。
 
 ```bash
-# after prepare the data, you could import the data to any nebula graph as you want.
+# after prepare the data, you could import the data to any NebulaGraph as you want.
 # space is mytest, graph address is 127.0.0.1:9669
 python3 run.py nebula importer -s mytest -a 127.0.0.1:9669
 

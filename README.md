@@ -2,10 +2,10 @@
 
 [中文文档](README_cn.md)
 
-`Nebula-Bench` is a tool to test the nebula-graph benchmark by using [LDBC](https://ldbc.github.io/) dataset.
+`Nebula-Bench` is a tool to test the NebulaGraph benchmark by using [LDBC](https://ldbc.github.io/) dataset.
 
 Currently, we use ldbc_snb_datagen [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3).
-It only support nebula graph 2.0+ release.
+It only support NebulaGraph 2.0+ release.
 
 The main features:
 
@@ -113,7 +113,7 @@ python3 run.py nebula importer
 Render the import config file according to the header files, and then run nebula-importer.
 
 ```bash
-# after prepare the data, you could import the data to any nebula graph as you want.
+# after prepare the data, you could import the data to any NebulaGraph as you want.
 # space is mytest, graph address is 127.0.0.1:9669
 python3 run.py nebula importer -s mytest -a 127.0.0.1:9669
 
