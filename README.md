@@ -127,7 +127,7 @@ python3 run.py nebula importer
 python3 run.py nebula importer --dry-run
 ```
 
-### nebula benchmark
+### NebulaGraph benchmark
 
 Use [k6](https://github.com/k6io/k6) with [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) extension.
 
