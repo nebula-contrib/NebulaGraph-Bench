@@ -1,6 +1,6 @@
-# nebula-bench
+# NebulaGraph Bench
 
-`Nebula-Bench` 用于测试 NebulaGraph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
+`NebulaGraph Bench` 用于测试 NebulaGraph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
 
 当前只适用于 NebulaGraph v2.0 以上版本。
 
@@ -11,7 +11,7 @@
 
 ## 工具依赖
 
-|   Nebula Bench    |     Nebua     | Nebula Importer |   K6 Plugin  |   ldbc_snb_datagen  |   Nebula-go    |
+|   NebulaGraph Bench    |     NebulaGraph     | NebulaGraph Importer |   K6 Plugin  |   ldbc_snb_datagen  |   NebulaGraph go    |
 |:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
 |       v0.2        |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
 |       v1.0.0      |    v2.5.0     |     v2.5.0      |    v0.0.7    |       v0.3.3        |     v2.5.0     |
@@ -107,7 +107,7 @@ python3 run.py data -og
 python3 run.py data -os
 ```
 
-### 导入数据到 nebula-graph
+### 导入数据到 NebulaGraph
 
 ```bash
 python3 run.py nebula importer
