@@ -199,9 +199,9 @@ or, just review the summary result in stdout. e.g.
 ```
 
 * `checks`, one check per iteration, verify `isSucceed` by default.
-* `data_received` and `data_sent`, used by HTTP requests, useless for nebula.
+* `data_received` and `data_sent`, used by HTTP requests, useless for NebulaGraph.
 * `iteration_duration`, time consuming for every iteration.
-* `latency`, time consuming in nebula server.
+* `latency`, time consuming in NebulaGraph server.
 * `responseTime`, time consuming in client.
 * `vus`, concurrent virtual users.
 
