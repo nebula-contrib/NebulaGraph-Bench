@@ -65,7 +65,7 @@ pip3 install --user -r requirements.txt
 python3 run.py --help
 ```
 
-prepare nebula tools.
+prepare NebulaGraph tools.
 
 * [nebula-importer](https://github.com/vesoft-inc/nebula-importer)
 * [xk6-nebula](https://github.com/vesoft-inc/k6-plugin)
