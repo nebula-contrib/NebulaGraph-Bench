@@ -1,20 +1,20 @@
-# nebula-bench
+# NebulaGraph Bench
 
 [中文文档](README_cn.md)
 
-`Nebula-Bench` is a tool to test the nebula-graph benchmark by using [LDBC](https://ldbc.github.io/) dataset.
+`NebulaGraph Bench` is a tool to test the NebulaGraph benchmark by using [LDBC](https://ldbc.github.io/) dataset.
 
 Currently, we use ldbc_snb_datagen [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3).
-It only support nebula graph 2.0+ release.
+It only support NebulaGraph 2.0+ release.
 
 The main features:
 
-* Generate the LDBC dataset and then import into nebula-graph.
+* Generate the LDBC dataset and then import into NebulaGraph.
 * Run load test with k6.
 
 ## Dependency
 
-|   Nebula Bench    |     Nebua     | Nebula Importer |   K6 Plugin  |   ldbc_snb_datagen  |   Nebula-go    |
+|   NebulaGraph Bench    |     NebuaGraph     | NebulaGraph Importer |   K6 Plugin  |   ldbc_snb_datagen  |   NebulaGraph go    |
 |:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
 |       [v0.2](https://github.com/vesoft-inc/nebula-bench/releases/tag/v0.2)        |    [v2.0.1](https://github.com/vesoft-inc/nebula-graph/releases/tag/v2.0.1)     |     [v2.0.0-ga](https://github.com/vesoft-inc/nebula-importer/releases/tag/v2.0.0-ga)   |    [v0.0.6](https://github.com/vesoft-inc/k6-plugin/releases/tag/v0.0.6)    |       [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)        |     [v2.0.0-ga](https://github.com/vesoft-inc/nebula-go/releases/tag/v2.0.0-ga)  |
 |       [v1.0.0](https://github.com/vesoft-inc/nebula-bench/releases/tag/v1.0.0)      |    [v2.5.0](https://github.com/vesoft-inc/nebula-graph/releases/tag/v2.5.0) / [v2.5.1](https://github.com/vesoft-inc/nebula-graph/releases/tag/v2.5.1)    |     [v2.5.1](https://github.com/vesoft-inc/nebula-importer/releases/tag/v2.5.1)      |    [v0.0.7](https://github.com/vesoft-inc/k6-plugin/releases/tag/v0.0.7)    |       [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)         |     [v2.5.1](https://github.com/vesoft-inc/nebula-go/releases/tag/v2.5.1)     |
@@ -65,7 +65,7 @@ pip3 install --user -r requirements.txt
 python3 run.py --help
 ```
 
-prepare nebula tools.
+prepare NebulaGraph tools.
 
 * [nebula-importer](https://github.com/vesoft-inc/nebula-importer)
 * [xk6-nebula](https://github.com/vesoft-inc/k6-plugin)
@@ -104,7 +104,7 @@ python3 run.py data -og
 python3 run.py data -os
 ```
 
-### import data into nebula-graph
+### import data into NebulaGraph
 
 ```bash
 python3 run.py nebula importer
@@ -113,7 +113,7 @@ python3 run.py nebula importer
 Render the import config file according to the header files, and then run nebula-importer.
 
 ```bash
-# after prepare the data, you could import the data to any nebula graph as you want.
+# after prepare the data, you could import the data to any NebulaGraph as you want.
 # space is mytest, graph address is 127.0.0.1:9669
 python3 run.py nebula importer -s mytest -a 127.0.0.1:9669
 
@@ -127,7 +127,7 @@ python3 run.py nebula importer
 python3 run.py nebula importer --dry-run
 ```
 
-### nebula benchmark
+### NebulaGraph benchmark
 
 Use [k6](https://github.com/k6io/k6) with [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) extension.
 
@@ -199,9 +199,9 @@ or, just review the summary result in stdout. e.g.
 ```
 
 * `checks`, one check per iteration, verify `isSucceed` by default.
-* `data_received` and `data_sent`, used by HTTP requests, useless for nebula.
+* `data_received` and `data_sent`, used by HTTP requests, useless for NebulaGraph.
 * `iteration_duration`, time consuming for every iteration.
-* `latency`, time consuming in nebula server.
+* `latency`, time consuming in NebulaGraph server.
 * `responseTime`, time consuming in client.
 * `vus`, concurrent virtual users.
 

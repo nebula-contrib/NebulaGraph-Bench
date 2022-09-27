@@ -1,17 +1,17 @@
-# nebula-bench
+# NebulaGraph Bench
 
-`Nebula-Bench` 用于测试 nebula-graph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
+`NebulaGraph Bench` 用于测试 NebulaGraph 的基线性能数据，使用 LDBC v0.3.3 的标准数据集。
 
-当前只适用于 nebula graph v2.0 以上版本。
+当前只适用于 NebulaGraph v2.0 以上版本。
 
 主要功能:
 
-* 生产 LDBC 数据集并导入 nebula graph。
+* 生产 LDBC 数据集并导入 NebulaGraph。
 * 用 k6 进行压测。
 
 ## 工具依赖
 
-|   Nebula Bench    |     Nebua     | Nebula Importer |   K6 Plugin  |   ldbc_snb_datagen  |   Nebula-go    |
+|   NebulaGraph Bench    |     NebulaGraph     | NebulaGraph Importer |   K6 Plugin  |   ldbc_snb_datagen  |   NebulaGraph go    |
 |:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
 |       v0.2        |    v2.0.1     |     v2.0.0-ga   |    v0.0.6    |       v0.3.3        |     v2.0.0-ga  |
 |       v1.0.0      |    v2.5.0     |     v2.5.0      |    v0.0.7    |       v0.3.3        |     v2.5.0     |
@@ -62,7 +62,7 @@ pip3 install --user -r requirements.txt
 python3 run.py --help
 ```
 
-准备 nebula graph 的工具。
+准备 NebulaGraph 的工具。
 
 安装 golang，然后编译相关工具。
 
@@ -107,7 +107,7 @@ python3 run.py data -og
 python3 run.py data -os
 ```
 
-### 导入数据到 nebula-graph
+### 导入数据到 NebulaGraph
 
 ```bash
 python3 run.py nebula importer
@@ -116,7 +116,7 @@ python3 run.py nebula importer
 会根据 header 文件，自动生成 importer 的配置文件，然后运行 importer 导入。
 
 ```bash
-# after prepare the data, you could import the data to any nebula graph as you want.
+# after prepare the data, you could import the data to any NebulaGraph as you want.
 # space is mytest, graph address is 127.0.0.1:9669
 python3 run.py nebula importer -s mytest -a 127.0.0.1:9669
 
@@ -202,7 +202,7 @@ awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
 ```
 
 * `checks`，每次执行有一个检查点，默认是检查服务端返回的 `isSucceed`。
-* `data_received` 和 `data_sent`，是 k6 工具自带的，对 nebula 用处不大。
+* `data_received` 和 `data_sent`，是 k6 工具自带的，对 NebulaGraph 用处不大。
 * `iteration_duration`，每次执行的总时间。
 * `latency`，服务端耗时。
 * `responseTime`，客户端耗时。
