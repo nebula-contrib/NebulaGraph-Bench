@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from nebula_bench.utils import logger
-
 
 class ScenarioMeta(type):
     def __new__(cls, name, bases, attrs, *args, **kwargs):
@@ -16,8 +14,10 @@ class ScenarioMeta(type):
 class BaseScenario(metaclass=ScenarioMeta):
     abstract = True
     is_insert_scenario = False
-    nGQL: str
+    nGQL: str =""
+    value: str = ""
     stage: dict
     csv_path: str
-    csv_index: list
     name: str
+    vus = [50, 100, 200, 300, 500]
+    rank: int = 0

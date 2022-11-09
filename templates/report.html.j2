@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>NebulaGraph Benchmark Chart</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body style="height: auto">
+	<div class="container-fluid">
+		<div id="title" class="h3">NebulaGraph Benchmark Chart</div>
+		{% if server %}
+		<div class="col-sm-2">
+			<div><span>select output</span></div>
+			<div style="margin-top: 5px;">
+					<select id="output" onchange="changeOutput()" style="width: auto;">
+					{% for output in outputs %}
+						{% if output == current_output%}
+							<option value="{{ output }}" selected>{{ output }}</option>
+						{% else %}
+							<option value="{{ output }}">{{ output }}</option>
+						{% endif %}
+					{% endfor %}
+					</select>
+			</div>
+		</div>
+		{% endif %}
+		
+		<div id="report" style="margin-top: 15px;font-size: 90%;"> </div>
+
+	<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+	<script type="text/javascript">
+		function draw_time_chart(container, title, vus, p90, p95, p99, showLabel) {
+			let option = {
+				title: {
+					text: title,
+					x: 'center',
+					textStyle: {
+						fontSize: 15,
+						fontWeight: 'normal'
+					}
+				},
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: ['p90', 'p95', 'p99'],
+					top: '8%'
+				},
+				grid: {
+					left: '3%',
+					right: '4%',
+					bottom: '3%',
+					containLabel: true
+				},
+				toolbox: {
+					feature: {
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: true,
+					data: vus
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [
+					{
+						name: 'p90',
+						type: 'line',
+						// stack: '总量',
+						data: p90,
+						label: {
+							show: showLabel,
+							position: 'right'
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					},
+					{
+						name: 'p95',
+						type: 'line',
+						// stack: '总量',
+						data: p95,
+						label: {
+							show: showLabel,
+							position: 'left'
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					},
+					{
+						name: 'p99',
+						type: 'line',
+						// stack: '总量',
+						data: p99,
+						label: {
+							show: showLabel,
+							position: 'top'
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					}
+				]
+			};
+
+			let myChart = echarts.init(document.getElementById(container));
+			myChart.setOption(option);
+		}
+
+		function draw_rate_chart(container, title, vus, qps, accuracy, showLabel) {
+			let option = {
+				title: {
+					text: title,
+					x: 'center',
+					textStyle: {
+						fontSize: 15,
+						fontWeight: 'normal'
+					}
+				},
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: ['QPS', 'Accuracy(%)'],
+					top: '8%'
+				},
+				grid: {
+					left: '3%',
+					right: '4%',
+					bottom: '3%',
+					containLabel: true
+				},
+				toolbox: {
+					feature: {
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: true,
+					data: vus
+				},
+				yAxis: [
+					{
+						type: 'value',
+						name: 'QPS',
+						position: 'left'
+					},
+					{
+						type: 'value',
+						name: 'Accuracy(%)',
+						position: 'right',
+						min: 0,
+						max: 120,
+						interval: 20
+					}
+				],
+				series: [
+					{
+						name: 'QPS',
+						type: 'line',
+						// stack: '总量',
+						data: qps,
+						yAxisIndex: 0,
+						label: {
+							show: showLabel
+						}
+					},
+					{
+						name: 'Accuracy(%)',
+						type: 'line',
+						// stack: '总量',
+						data: accuracy,
+						yAxisIndex: 1
+					}
+				]
+			};
+
+			let myChart = echarts.init(document.getElementById(container));
+			myChart.setOption(option);
+		}
+
+
+		function get_echart_data(reports, type, metric) {
+			let data = [];
+
+			for (let i = 0; i < reports.length; i++) {
+				let metrics = reports[i]["report"]["metrics"]
+				if (metrics[type] == undefined) {
+					return data
+				}
+				if (metrics[type][metric] == undefined) {
+					return data
+				}
+
+				let d = metrics[type][metric];
+				if (type == "latency" || type == "responseTime") {
+					d = d / 1000
+				}
+				if (typeof d === 'number') {
+					if (parseInt(d, 10) === d) {
+						data.push(d);
+					} else {
+						data.push(d.toFixed(2));
+					}
+				} else {
+					data.push(d);
+				}
+			}
+			return data
+		}
+
+		function draw_all(data) {
+			for (let i = 0; i < data.length; i++) {
+				let tc = data[i];
+				let info = tc.case;
+				let k6Metrics = tc.k6
+				let infoDiv = document.createElement('div');
+				infoDiv.classList.add("row");
+				infoDiv.style = "margin-top: 15px;"
+				let name = document.createElement('div');
+				name.innerHTML = info.name;
+				infoDiv.appendChild(name);
+				let stmt = document.createElement('div');
+				stmt.style = "color: gray;font-size: 80%;"
+				stmt.innerHTML = info.stmt;
+				infoDiv.appendChild(stmt);
+				let report = document.getElementById('report');
+				report.appendChild(infoDiv);
+				let drawDiv = document.createElement('div');
+				drawDiv.classList.add("row");
+				drawDiv.style = "margin-top: 8px;";
+				report.appendChild(drawDiv);
+				let vus = [];
+				for (let j = 0; j < k6Metrics.length; j++) {
+					vus.push(k6Metrics[j].vu+"_vu");
+				}
+				// QPS and Accuracy
+				let iterDiv = document.createElement('div');
+				iterDiv.classList.add("col-sm-3");
+				let iterDraw = document.createElement('div');
+				iterDraw.id = info.name + "_iter";
+				iterDraw.style = "height: 300px; width: 100%;"
+				iterDiv.appendChild(iterDraw)
+				drawDiv.appendChild(iterDiv);
+				passes = get_echart_data(k6Metrics, "checks", "passes");
+				fails = get_echart_data(k6Metrics, "checks", "fails");
+				let rate = []
+				for (let j = 0; j < passes.length; j++) {
+					rate.push((passes[j] / (passes[j] + fails[j]) * 100).toFixed(2));
+				}
+				draw_rate_chart(
+					iterDraw.id,
+					info.name + " QPS and Accuracy",
+					vus,
+					get_echart_data(k6Metrics, "iterations", "rate"),
+					rate,
+					true,
+				)
+				//latency, response time, row size
+				const metrics = ["latency", "responseTime", "rowSize"]
+				for (let m of metrics) {
+					let metricDiv = document.createElement('div');
+					let metricDraw = document.createElement('div');
+					metricDiv.classList.add("col-sm-3");
+					metricDraw.id = info.name + "_" + m;
+					metricDraw.style = "height: 300px; width: 100%;";
+					metricDiv.appendChild(metricDraw);
+					drawDiv.appendChild(metricDiv);
+					let title = m
+					if (m === "rowSize") {
+						title = title[0].toUpperCase() + title.slice(1)
+					} else {
+						title = title[0].toUpperCase() + title.slice(1) + " (ms)"
+					}
+					draw_time_chart(
+						metricDraw.id,
+						info.name + " " + title,
+						vus,
+						get_echart_data(k6Metrics, m, "p(90)"),
+						get_echart_data(k6Metrics, m, "p(95)"),
+						get_echart_data(k6Metrics, m, "p(99)"),
+						true,
+					);
+				}
+			}
+		};
+
+		let data = {{ data }}
+			
+		draw_all(data);
+
+		{% if server %}
+		function changeOutput() {
+			var val = document.getElementById("output").value;
+			window.location.href = "/?output=" + val;
+		}
+		{% endif %}
+
+	</script>
+</body>
+
+</html>

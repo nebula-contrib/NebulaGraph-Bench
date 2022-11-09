@@ -5,6 +5,7 @@ import inspect
 import importlib
 import socket
 import logging
+import datetime
 
 import jinja2
 import click
@@ -26,7 +27,10 @@ def load_class(package_name, load_all, base_class, class_name=None):
                 _class = getattr(_module, name)
                 if not inspect.isclass(_class):
                     continue
-                if issubclass(_class, base_class) and _class.__name__ != base_class.__name__:
+                if (
+                    issubclass(_class, base_class)
+                    and _class.__name__ != base_class.__name__
+                ):
                     r.append(_class)
     else:
         assert class_name is not None, "class_name should not be None"
@@ -95,3 +99,7 @@ def run_process(command, env=None):
             if output:
                 output = output.replace("\n", "")
                 click.echo(output)
+
+
+def get_now_str():
+    return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
