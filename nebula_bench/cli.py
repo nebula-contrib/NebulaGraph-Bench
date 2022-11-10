@@ -194,18 +194,21 @@ def report():
     "--folder",
     help="dump the result in folder, default: latest output",
 )
-def export(folder):
+@click.option(
+    "-o",
+    "--output",
+    help="dump the html to file, default: report.html",
+)
+def export(folder, output):
     controller = DumpController()
     if folder is None:
         folder = controller.get_latest_output()
 
-    controller.export(
-        folder=folder,
-    )
+    controller.export(folder=folder,output=output)
 
 
 @report.command(help="launch the http report server")
 @click.option("-p", "--port", default=4040, help="http server port, default: 4040")
 def serve(port):
     controller = DumpController()
-    controller.serve()
+    controller.serve(port)

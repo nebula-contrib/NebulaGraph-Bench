@@ -147,15 +147,15 @@ python3 run.py stress run --args='-u 10 -d 3s'
 python3 run.py stress scenarios
 
 # run go.Go1Step scenarios with 10 virtual users, every scenario lasts 3 seconds.
-python3 run.py stress run -scenario go.Go1Step --args='-u 10 -d 3s'
+python3 run.py stress run -scenario go.Go1StepEdge --args='-u 10 -d 3s'
 
 # run go.Go1Step scenarios with special test stage.
 # ramping up from 0 to 10 vus in first 10 seconds, then run 10 vus in 30 seconds, 
 # then ramping up from 10 to 50 vus in 10 seconds.
-python3 run.py stress run -scenario go.Go1Step --args='-s 10s:10 -s 30s:10 -s 10s:50'
+python3 run.py stress run -scenario go.Go1StepEdge --args='-s 10s:10 -s 30s:10 -s 10s:50'
 
 # use csv output
-python3 run.py stress run -scenario go.Go1Step --args='-s 10s:10 -s 30s:10 -s 10s:50 -o csv=test.csv'
+python3 run.py stress run -scenario go.Go1StepEdge --args='-s 10s:10 -s 30s:10 -s 10s:50 -o csv=test.csv'
 ```
 
 for more k6 args, please refer to k6 run help.
@@ -194,6 +194,7 @@ or, just review the summary result in stdout. e.g.
      iterations...........: 113778  1861.550127/s
      latency..............: min=462      avg=49182.770298 med=37245   max=1160358 p(90)=93377   p(95)=142304.15 p(99)=258465.89
      responseTime.........: min=662      avg=52636.793537 med=40659   max=1177651 p(90)=98556.5 p(95)=147036.15 p(99)=262869.63
+     rowSize..............: min=0        avg=9.212424    med=3      max=243   p(90)=25     p(95)=40      p(99)=70
      vus..................: 100     min=0         max=100
      vus_max..............: 100     min=100       max=100
 ```
@@ -201,8 +202,9 @@ or, just review the summary result in stdout. e.g.
 * `checks`, one check per iteration, verify `isSucceed` by default.
 * `data_received` and `data_sent`, used by HTTP requests, useless for NebulaGraph.
 * `iteration_duration`, time consuming for every iteration.
-* `latency`, time consuming in NebulaGraph server.
-* `responseTime`, time consuming in client.
+* `latency`, time consuming in NebulaGraph server, unit: (us).
+* `responseTime`, time consuming in client, unit: (us).
+* `rowSize`, response row size.
 * `vus`, concurrent virtual users.
 
 In general
@@ -214,6 +216,21 @@ responseTime = latency + (time consuming for network) + (client decode)
 As one iteration has one check, it means run `113778` queries.
 
 The unit of latency is `us`.
+
+### Report
+
+```bash
+# generate the `report.html` with summary json file in `output/20221109140449` folder.
+python3 run.py report export -f output/20221109140449
+
+# export to a new file.
+python3 run.py report export -f output/20221109140449 -o new_report.html
+
+# launch a http server with port 5050, and could browser all result in `output` folder.
+python3 run.py report serve -p 5050
+```
+
+![report](doc/img/report.png)
 
 ## and more
 
@@ -247,4 +264,6 @@ CREATE EDGE IF NOT EXISTS `HAS_TAG`();
 CREATE EDGE IF NOT EXISTS `IS_LOCATED_IN`();
 CREATE EDGE IF NOT EXISTS `HAS_TYPE`();
 CREATE EDGE IF NOT EXISTS `KNOWS`(`creationDate` datetime);
+CREATE TAG INDEX IF NOT EXISTS `person_first_name_idx` on `Person`(firstName(10));
+CREATE EDGE INDEX IF NOT EXISTS `like_creationDate_idx` on `LIKES`(creationDate);
 ```

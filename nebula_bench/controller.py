@@ -73,9 +73,9 @@ class DumpController(object):
     def __init__(self):
         pass
 
-    def export(self, folder):
+    def export(self, folder, output):
         utils.jinja_dump(
-            "report.html.j2", "report.html", {"data": self.get_data(folder)}
+            "report.html.j2", output, {"data": self.get_data(folder)}
         )
 
     def get_data(self, folder):
@@ -135,7 +135,7 @@ class DumpController(object):
             data.append(case)
         return data
 
-    def serve(self):
+    def serve(self, port=5000):
         import flask
 
         app = flask.Flask(
@@ -162,7 +162,7 @@ class DumpController(object):
                 current_output=current_output_name,
             )
 
-        app.run(host="0.0.0.0")
+        app.run(host="0.0.0.0", port=port)
 
     def get_all_output(self):
         output_folder = setting.WORKSPACE_PATH / "output"

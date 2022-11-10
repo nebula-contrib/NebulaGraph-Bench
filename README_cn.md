@@ -149,16 +149,16 @@ python3 run.py stress run --args='-u 10 -d 3s'
 # list all stress test scenarios
 python3 run.py stress scenarios
 
-# run go.Go1Step scenarios with 10 virtual users, every scenario lasts 3 seconds.
-python3 run.py stress run -scenario go.Go1Step --args='-u 10 -d 3s'
+# run go.Go1StepEdge scenarios with 10 virtual users, every scenario lasts 3 seconds.
+python3 run.py stress run -scenario go.Go1StepEdge --args='-u 10 -d 3s'
 
-# run go.Go1Step scenarios with special test stage.
+# run go.Go1StepEdge scenarios with special test stage.
 # ramping up from 0 to 10 vus in first 10 seconds, then run 10 vus in 30 seconds, 
 # then ramping up from 10 to 50 vus in 10 seconds.
-python3 run.py stress run -scenario go.Go1Step --args='-s 10s:10 -s 30s:10 -s 10s:50'
+python3 run.py stress run -scenario go.Go1StepEdge --args='-s 10s:10 -s 30s:10 -s 10s:50'
 
 # use csv output
-python3 run.py stress run -scenario go.Go1Step --args='-s 10s:10 -s 30s:10 -s 10s:50 -o csv=test.csv'
+python3 run.py stress run -scenario go.Go1StepEdge --args='-s 10s:10 -s 30s:10 -s 10s:50 -o csv=test.csv'
 ```
 
 更多 k6 参数，请参考。
@@ -197,6 +197,7 @@ awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
      iterations...........: 113778  1861.550127/s
      latency..............: min=462      avg=49182.770298 med=37245   max=1160358 p(90)=93377   p(95)=142304.15 p(99)=258465.89
      responseTime.........: min=662      avg=52636.793537 med=40659   max=1177651 p(90)=98556.5 p(95)=147036.15 p(99)=262869.63
+     rowSize..............: min=0        avg=9.212424    med=3      max=243   p(90)=25     p(95)=40      p(99)=70
      vus..................: 100     min=0         max=100
      vus_max..............: 100     min=100       max=100
 ```
@@ -204,8 +205,9 @@ awk -F ',' 'NR>1{print $NF}' output/output_Go1Step.csv |sort|uniq -c
 * `checks`，每次执行有一个检查点，默认是检查服务端返回的 `isSucceed`。
 * `data_received` 和 `data_sent`，是 k6 工具自带的，对 NebulaGraph 用处不大。
 * `iteration_duration`，每次执行的总时间。
-* `latency`，服务端耗时。
-* `responseTime`，客户端耗时。
+* `latency`，服务端耗时，单位：微秒(us)。
+* `responseTime`，客户端耗时, 单位：微秒(us)。
+* `rowSize`，请求返回行数。
 * `vus`，并发的用户数
 
 大体来说
@@ -218,8 +220,54 @@ responseTime = latency + (网络传输的耗时) + (客户端解码的耗时)
 
 latency 的单位是 `us`。
 
+### 报告
+
+```bash
+# generate the `report.html` with summary json file in `output/20221109140449` folder.
+python3 run.py report export -f output/20221109140449
+
+# export to a new file.
+python3 run.py report export -f output/20221109140449 -o new_report.html
+
+# launch a http server with port 5050, and could browser all result in `output` folder.
+python3 run.py report serve -p 5050
+```
+
+![report](doc/img/report.png)
+
 ## 更多
 
 * 生成的数据文件，如果是 `aaa_xxYY_bbb` 格式，比如 `comment_hasTag_tag`，会认为是一个边类型，然后边的格式是 `XX_YY`。和 ldbc 保持一致 [ldbc_snb_interactive](https://github.com/ldbc/ldbc_snb_interactive/blob/main/cypher/queries/interactive-complex-1.cypher)
 * 否则是一个 Tag 类型。
 * 不同的 Tag，有可能 Vertex ID 是一样的，比如 Forum 和 Post。暂时没有特殊处理。
+
+
+LDBC schema
+
+```bash
+CREATE TAG IF NOT EXISTS `Post`(`imageFile` string,`creationDate` datetime,`locationIP` string,`browserUsed` string,`language` string,`content` string,`length` int);
+CREATE TAG IF NOT EXISTS `Tag`(`name` string,`url` string);
+CREATE TAG IF NOT EXISTS `Tagclass`(`name` string,`url` string);
+CREATE TAG IF NOT EXISTS `Organisation`(`type` string,`name` string,`url` string);
+CREATE TAG IF NOT EXISTS `Place`(`name` string,`url` string,`type` string);
+CREATE TAG IF NOT EXISTS `Person`(`firstName` string,`lastName` string,`gender` string,`birthday` string,`creationDate` datetime,`locationIP` string,`browserUsed` string);
+CREATE TAG IF NOT EXISTS `Forum`(`title` string,`creationDate` datetime);
+CREATE TAG IF NOT EXISTS `Comment`(`creationDate` datetime,`locationIP` string,`browserUsed` string,`content` string,`length` int);
+CREATE EDGE IF NOT EXISTS `HAS_CREATOR`();
+CREATE EDGE IF NOT EXISTS `REPLY_OF`();
+CREATE EDGE IF NOT EXISTS `STUDY_AT`(`classYear` int);
+CREATE EDGE IF NOT EXISTS `WORK_AT`(`workFrom` int);
+CREATE EDGE IF NOT EXISTS `HAS_MODERATOR`();
+CREATE EDGE IF NOT EXISTS `LIKES`(`creationDate` datetime);
+CREATE EDGE IF NOT EXISTS `HAS_MEMBER`(`joinDate` datetime);
+CREATE EDGE IF NOT EXISTS `IS_PART_OF`();
+CREATE EDGE IF NOT EXISTS `CONTAINER_OF`();
+CREATE EDGE IF NOT EXISTS `HAS_INTEREST`();
+CREATE EDGE IF NOT EXISTS `IS_SUBCLASS_OF`();
+CREATE EDGE IF NOT EXISTS `HAS_TAG`();
+CREATE EDGE IF NOT EXISTS `IS_LOCATED_IN`();
+CREATE EDGE IF NOT EXISTS `HAS_TYPE`();
+CREATE EDGE IF NOT EXISTS `KNOWS`(`creationDate` datetime);
+CREATE TAG INDEX IF NOT EXISTS `person_first_name_idx` on `Person`(firstName(10));
+CREATE EDGE INDEX IF NOT EXISTS `like_creationDate_idx` on `LIKES`(creationDate);
+```
