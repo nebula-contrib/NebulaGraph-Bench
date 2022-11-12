@@ -35,6 +35,8 @@ clientSettings:
           {%- endfor -%}
           );
       {% endfor %}
+      CREATE TAG INDEX IF NOT EXISTS `person_first_name_idx` on `Person`(firstName(10));
+      CREATE EDGE INDEX IF NOT EXISTS `like_creationDate_idx` on `LIKES`(creationDate);
 
     afterPeriod: 20s
 logPath: ./err/test.log

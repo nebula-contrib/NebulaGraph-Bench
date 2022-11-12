@@ -1,14 +1,16 @@
 # -*- encoding: utf-8 -*-
+import os
 import sys
 import inspect
 import copy
 from pathlib import Path
+import json
 
 import click
 
 from nebula_bench.utils import load_class, jinja_dump, run_process
 from nebula_bench.common.base import BaseScenario
-from nebula_bench.utils import logger
+from nebula_bench.utils import logger, get_now_str
 from nebula_bench import setting
 
 
@@ -19,15 +21,26 @@ def load_scenarios(scenarios):
         r = load_class("nebula_bench.scenarios", False, BaseScenario, scenarios)
 
     r = [x for x in r if x.abstract == False]
+    r = sorted(r, key=lambda x: x.rank)
     return r
 
 
 class Stress(object):
-    DEFAULT_VU = 100
     DEFAULT_DURATION = "60s"
 
     def __init__(
-        self, folder, address, user, password, space, vid_type, scenarios, args, dry_run, **kwargs
+        self,
+        folder,
+        address,
+        user,
+        password,
+        space,
+        vid_type,
+        output_folder,
+        scenarios,
+        args,
+        dry_run,
+        **kwargs
     ):
         self.folder = folder or setting.DATA_FOLDER
         self.address = address or setting.NEBULA_ADDRESS
@@ -36,14 +49,14 @@ class Stress(object):
         self.space = space or setting.NEBULA_SPACE
         self.vid_type = vid_type
         self.scenarios = []
-        self.output_folder = "output"
+        self.output_folder = output_folder
         self.dry_run = dry_run
         self.args = args
         self.scenarios = load_scenarios(scenarios)
         logger.info("total stress test scenarios is {}".format(len(self.scenarios)))
 
     # dump config file
-    def dump_config(self, scenario):
+    def dump_config(self, scenario, _vu=None):
         pass
 
     def run(self):
@@ -52,6 +65,7 @@ class Stress(object):
 
 class StressFactory(object):
     type_list = ["K6"]
+    output_folder = "output/{}".format(get_now_str())
 
     @classmethod
     def gen_stress(
@@ -75,7 +89,17 @@ class StressFactory(object):
         if args is not None:
             args = args.strip()
         return clazz(
-            folder, address, user, password, space, vid_type, scenarios, args, dry_run, **kwargs
+            folder,
+            address,
+            user,
+            password,
+            space,
+            vid_type,
+            cls.output_folder,
+            scenarios,
+            args,
+            dry_run,
+            **kwargs
         )
 
     @classmethod
@@ -89,16 +113,9 @@ class StressFactory(object):
 
 
 class K6Stress(Stress):
-    def _update_read_config(self, scenario, kwargs):
-        kwargs["param"] = ",".join(["d[" + str(x) + "]" for x in scenario.csv_index])
-        return kwargs
-
-    def _update_insert_config(self, scenario, kwargs):
-        kwargs["value"] = scenario.value
-        kwargs["param"] = ",".join(["d[" + str(x) + "]" for x in scenario.csv_index])
-        return kwargs
-
-    def dump_config(self, scenario):
+    def dump_config(self, scenario, vu=None):
+        if vu is None:
+            vu = 50
         assert issubclass(scenario, BaseScenario)
         name = scenario.name
         kwargs = {
@@ -107,14 +124,14 @@ class K6Stress(Stress):
             "password": self.password,
             "space": self.space,
             "csv_path": "{}/{}".format(self.folder, scenario.csv_path),
-            "output_path": "{}/output_{}.csv".format(self.output_folder, name),
-            "nGQL": scenario.nGQL,
+            "output_path": self.get_output_file(scenario, vu),
+            "nGQL": scenario.nGQL.replace('"', '\\"'),
+            "value": scenario.value.replace('"', '\\"'),
+            "vu": vu,
         }
         if scenario.is_insert_scenario:
-            kwargs = self._update_insert_config(scenario, kwargs)
             template_file = "k6_config_insert.js.j2"
         else:
-            kwargs = self._update_read_config(scenario, kwargs)
             template_file = "k6_config.js.j2"
 
         logger.info(
@@ -156,13 +173,19 @@ class K6Stress(Stress):
             r[key] = None
         return r
 
+    def get_summary_file(self, scenario, vu):
+        return "{}/result_{}_{}.json".format(self.output_folder, vu, scenario.name)
+
+    def get_output_file(self, scenario, vu):
+        return "{}/output{}_{}.csv".format(self.output_folder, vu, scenario.name)
+
     def run(self):
         logger.info("run stress test in k6")
         params = self._get_params()
 
         # cannot use both stage and vu
         run_with_stage = "-s" in params or "--stage" in params
-        vu = self.DEFAULT_VU
+        vu = None
         duration = self.DEFAULT_DURATION
         if "-u" in params:
             vu = params.pop("-u")[0]
@@ -176,17 +199,29 @@ class K6Stress(Stress):
         if "--duration" in params:
             duration = params.pop("--duration")[0]
 
-        logger.info("every scenario would run by {} vus and last {}".format(vu, duration))
-        Path(self.output_folder).mkdir(exist_ok=True)
+        Path(self.output_folder).mkdir(exist_ok=True, parents=True)
         if "--summary-trend-stats" not in params:
             params["--summary-trend-stats"] = ["min,avg,med,max,p(90),p(95),p(99)"]
-        if setting.INFLUXDB_URL is not None and "--out" not in params and "-o" not in params:
+        if (
+            setting.INFLUXDB_URL is not None
+            and "--out" not in params
+            and "-o" not in params
+        ):
             params["--out"] = ["influxdb={}".format(setting.INFLUXDB_URL)]
 
         for scenario in self.scenarios:
+            vus = []
+            if vu is not None:
+                vus = [vu]
+            else:
+                vus = scenario.vus
+            self.run_scenario(scenario, params, vus, duration)
+
+    def run_scenario(self, scenario, params, vus, duration):
+        for _vu in vus:
             _params = copy.copy(params)
-            self.dump_config(scenario)
-            if run_with_stage:
+            self.dump_config(scenario, _vu)
+            if "-s" in _params or "--stage" in _params:
                 command = [
                     "scripts/k6",
                     "run",
@@ -198,15 +233,13 @@ class K6Stress(Stress):
                     "run",
                     "{}/{}.js".format(self.output_folder, scenario.name),
                     "-u",
-                    str(vu),
+                    str(_vu),
                     "-d",
                     str(duration),
                 ]
 
             if "--summary-export" not in _params:
-                _params["--summary-export"] = [
-                    "{}/result_{}.json".format(self.output_folder, scenario.name)
-                ]
+                _params["--summary-export"] = [self.get_summary_file(scenario, _vu)]
 
             for param, values in _params.items():
                 if values is None:
@@ -217,7 +250,24 @@ class K6Stress(Stress):
                         command.append(v)
 
             click.echo("run command as below:")
-            click.echo(" ".join([x if "(" not in x else '"{}"'.format(x) for x in command]))
+            click.echo(
+                " ".join([x if "(" not in x else '"{}"'.format(x) for x in command])
+            )
             if self.dry_run is not None and self.dry_run:
                 continue
             run_process(command)
+            # delete the output file if all results are passed
+            self.delete_output_if_passed(scenario, _vu)
+
+    def delete_output_if_passed(self, scenario, vu):
+        summary_file = self.get_summary_file(scenario, vu)
+        output_file = self.get_output_file(scenario, vu)
+        if not os.path.exists(summary_file):
+            return
+        try:
+            with open(summary_file, "r") as f:
+                summary = json.loads(f.read())
+                if summary["metrics"]["checks"]["fails"] == 0:
+                    os.remove(output_file)
+        except Exception as e:
+            pass

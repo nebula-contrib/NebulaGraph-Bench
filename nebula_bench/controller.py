@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
-
+import os
+import json
 from nebula_bench import parser
 from nebula_bench import setting
 from nebula_bench.utils import logger
@@ -68,62 +69,115 @@ class NebulaController(BaseController):
         return dumper.dump(**kwargs)
 
 
-class StressController(BaseController):
-    def __init__(
-        self,
-        data_folder=None,
-        space=None,
-        user=None,
-        password=None,
-        address=None,
-        vid_type=None,
-    ):
-        BaseController.__init__(
-            self,
-            data_folder=data_folder,
-            space=space,
-            user=user,
-            password=password,
-            address=address,
+class DumpController(object):
+    def __init__(self):
+        pass
+
+    def export(self, folder, output):
+        utils.jinja_dump(
+            "report.html.j2", output, {"data": self.get_data(folder)}
         )
-        self.vid_type = vid_type or "int"
-        self.record = None
-        self.class_list = []
 
-    def load_scenarios(self, scenario):
+    def get_data(self, folder):
+        # [
+        #     {
+        #         "case":{
+        #             "name": "case1",
+        #             "stmt": "stmt",
+        #         },
+        #         "k6":[
+        #             {"vu": 200, "report":metric1},
+        #             {"vu": 500, "report":metric2},
+        #         ]
+        #     }
+        # ]
+        data = list()
+        if folder is None:
+            return
         package_name = "nebula_bench.scenarios"
-        if scenario.lower() != "all":
-            return utils.load_class(
-                package_name,
-                load_all=False,
-                base_class=BaseScenario,
-                class_name=scenario,
-            )
-        else:
-            return utils.load_class(
-                package_name, load_all=True, base_class=BaseScenario
+        scenarios = utils.load_class(
+            package_name, load_all=True, base_class=BaseScenario
+        )
+
+        paths = sorted(Path(folder).iterdir(), key=os.path.getmtime)
+        case = None
+        for file in paths:
+            if file.is_dir():
+                continue
+            n = file.name
+            if not n.startswith("result") or not n.endswith(".json"):
+                continue
+            file_name = n.rstrip(".json")
+            _, vu, case_name = file_name.split("_", 3)
+            if case is not None and case["case"]["name"] != case_name:
+                data.append(case)
+                case = None
+            if case is None:
+                case = {}
+                case["case"] = {}
+                for s in scenarios:
+                    if s.name == case_name:
+                        case["case"]["stmt"] = s.nGQL
+                        break
+                case["case"]["name"] = case_name
+                case["k6"] = list()
+
+            file_path = Path(folder) / n
+            with open(file_path, "r") as f:
+                metric = json.load(f)
+
+            k6 = {}
+            k6["vu"] = int(vu)
+            k6["report"] = metric
+            case["k6"].append(k6)
+
+        if case is not None:
+            data.append(case)
+        return data
+
+    def serve(self, port=5000):
+        import flask
+
+        app = flask.Flask(
+            __name__, template_folder=setting.WORKSPACE_PATH / "templates"
+        )
+
+        @app.route("/", methods=["GET"])
+        def index():
+            current_output_name = flask.request.args.get("output", "")
+            if current_output_name == "":
+                latest = self.get_latest_output()
+                if latest is None:
+                    return "No output"
+                current_output_name = Path(latest).name
+            outputs_name = [Path(output).name for output in self.get_all_output()]
+
+            return flask.render_template(
+                "report.html.j2",
+                data=self.get_data(
+                    (setting.WORKSPACE_PATH / "output" / current_output_name).absolute()
+                ),
+                server=True,
+                outputs=outputs_name,
+                current_output=current_output_name,
             )
 
-    def run(self, nebula_scenario):
-        result_folder = "target/result"
-        p = self.workspace_path / result_folder
-        p.mkdir(exist_ok=True, parents=True)
+        app.run(host="0.0.0.0", port=port)
 
-        for _class in self.load_scenarios(nebula_scenario):
-            module_name = _class.__module__.split(".")[-1]
-            scenario = "{}.{}".format(module_name, _class.__name__)
-            command = [
-                "locust",
-                "-f",
-                "nebula_bench/locust_file.py",
-                "--headless",
-                "--nebula-scenario",
-                scenario,
-                "--csv",
-                "{}/{}.csv".format(result_folder, _class.result_file_name),
-                "--logfile",
-                "{}/{}.log".format(result_folder, _class.result_file_name),
-                "--html",
-                "{}/{}.html".format(result_folder, _class.result_file_name),
-            ]
-            utils.run_process(command)
+    def get_all_output(self):
+        output_folder = setting.WORKSPACE_PATH / "output"
+        if not output_folder.exists():
+            return []
+        paths = []
+        folders = sorted(output_folder.iterdir(), key=os.path.getmtime)
+        for folder in folders:
+            if not folder.is_dir():
+                continue
+            paths.append(folder.absolute())
+        return paths
+
+    def get_latest_output(self):
+        all = self.get_all_output()
+        if len(all) == 0:
+            return None
+        return self.get_all_output()[-1]

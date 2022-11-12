@@ -4,21 +4,35 @@ from nebula_bench.common.base import BaseScenario
 
 class BaseGoScenario(BaseScenario):
     abstract = True
-    nGQL = "GO 1 STEP FROM {} OVER KNOWS yield KNOWS.creationDate"
+    nGQL = "GO 1 STEP FROM {0} OVER KNOWS yield KNOWS.creationDate"
     csv_path = "social_network/dynamic/person.csv"
-    csv_index = [0]
 
 
-class Go1Step(BaseGoScenario):
+class Go1StepEdge(BaseGoScenario):
     abstract = False
-    nGQL = "GO 1 STEP FROM {} OVER KNOWS yield KNOWS.creationDate"
+    nGQL = "GO 1 STEP FROM {0} OVER KNOWS yield KNOWS.creationDate"
 
 
-class Go2Step(BaseGoScenario):
+class Go2StepEdge(BaseGoScenario):
     abstract = False
-    nGQL = "GO 2 STEP FROM {} OVER KNOWS yield KNOWS.creationDate"
+    nGQL = "GO 2 STEP FROM {0} OVER KNOWS yield KNOWS.creationDate"
 
 
-class Go3Step(BaseGoScenario):
+class Go3StepEdge(BaseGoScenario):
     abstract = False
-    nGQL = "GO 3 STEP FROM {} OVER KNOWS yield KNOWS.creationDate"
+    nGQL = "GO 3 STEP FROM {0} OVER KNOWS yield KNOWS.creationDate"
+
+
+class Go1StepDst(BaseGoScenario):
+    abstract = False
+    nGQL = "GO 1 STEP FROM {0} OVER KNOWS yield $$.Person.firstName"
+
+
+class Go2StepDst(BaseGoScenario):
+    abstract = False
+    nGQL = "GO 2 STEP FROM {0} OVER KNOWS yield $$.Person.firstName"
+
+
+class Go3StepDst(BaseGoScenario):
+    abstract = False
+    nGQL = "GO 3 STEP FROM {0} OVER KNOWS yield $$.Person.firstName"

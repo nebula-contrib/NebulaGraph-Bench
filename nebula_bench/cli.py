@@ -4,7 +4,7 @@ import click
 
 from nebula_bench import setting
 from nebula_bench.utils import logger
-from nebula_bench.controller import NebulaController
+from nebula_bench.controller import NebulaController, DumpController
 from nebula_bench.utils import run_process
 from nebula_bench.stress import StressFactory, load_scenarios
 
@@ -181,3 +181,34 @@ def scenarios():
         module = s.__module__.split(".")[-1]
         name = s.__name__
         click.echo("\t{}.{}".format(module, name))
+
+
+@cli.group(help="nebulagraph performance report")
+def report():
+    pass
+
+
+@report.command(help="dump the html report")
+@click.option(
+    "-f",
+    "--folder",
+    help="dump the result in folder, default: latest output",
+)
+@click.option(
+    "-o",
+    "--output",
+    help="dump the html to file, default: report.html",
+)
+def export(folder, output):
+    controller = DumpController()
+    if folder is None:
+        folder = controller.get_latest_output()
+
+    controller.export(folder=folder,output=output)
+
+
+@report.command(help="launch the http report server")
+@click.option("-p", "--port", default=4040, help="http server port, default: 4040")
+def serve(port):
+    controller = DumpController()
+    controller.serve(port)
