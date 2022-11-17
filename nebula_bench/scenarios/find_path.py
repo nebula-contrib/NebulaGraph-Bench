@@ -15,3 +15,4 @@ class FindShortestPath(BaseFindShortestPath):
 class FindShortestNoVidPath(BaseFindShortestPath):
     abstract = False
     nGQL = "FIND SHORTEST PATH FROM {0} TO -1 OVER * YIELD path as p"
+    
