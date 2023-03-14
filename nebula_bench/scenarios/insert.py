@@ -37,4 +37,4 @@ class InsertEdgeScenario(BaseScenario):
     abstract = False
     csv_path = "social_network/dynamic/person_likes_comment.csv"
     rank = 9999
-    
+
