@@ -21,7 +21,7 @@ The main features:
 |       [v1.0.0](https://github.com/vesoft-inc/nebula-bench/releases/tag/v1.0.0)      |    [v2.6.0](https://github.com/vesoft-inc/nebula/releases/tag/v2.6.0) / [v2.6.1](https://github.com/vesoft-inc/nebula/releases/tag/v2.6.1) / [v2.6.2](https://github.com/vesoft-inc/nebula/releases/tag/v2.6.2)    |     [v2.6.0](https://github.com/vesoft-inc/nebula-importer/releases/tag/v2.6.0)      |    [v0.0.8](https://github.com/vesoft-inc/k6-plugin/releases/tag/v0.0.8)    |      [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)         |     [v2.6.0](https://github.com/vesoft-inc/nebula-go/releases/tag/v2.6.0)     |
 |       [v1.1.0](https://github.com/vesoft-inc/nebula-bench/releases/tag/v1.1.0)      |    [v3.0.0](https://github.com/vesoft-inc/nebula/releases/tag/v3.0.0) /  [v3.0.1](https://github.com/vesoft-inc/nebula/releases/tag/v3.0.1) |     [v3.0.0](https://github.com/vesoft-inc/nebula-importer/releases/tag/v3.0.0)      |    [v0.0.9](https://github.com/vesoft-inc/k6-plugin/releases/tag/v0.0.9)    |        [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)        |     [v3.0.0](https://github.com/vesoft-inc/nebula-go/releases/tag/v3.0.0)     |
 |       [v1.2.0](https://github.com/vesoft-inc/nebula-bench/releases/tag/v1.2.0)      |    [v3.1.0](https://github.com/vesoft-inc/nebula/releases/tag/v3.1.0)     |     [v3.1.0](https://github.com/vesoft-inc/nebula-importer/releases/tag/v3.1.0)      |    [v1.0.0](https://github.com/vesoft-inc/k6-plugin/releases/tag/v1.0.0)    |        [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)        |     NONE       |
-|       master      |    nightly    |     master      |    master    |       v0.3.3        |     NONE       |
+|       master      |    nightly    |     [v3.2.0](https://github.com/vesoft-inc/nebula/releases/tag/v3.2.0)      |    [v1.0.1](https://github.com/vesoft-inc/k6-plugin/releases/tag/v1.0.1)    |     [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)      |     NONE       |
 
 ## How to use
 
@@ -97,9 +97,9 @@ python3 run.py data  -s 10
 export HADOOP_CLIENT_OPTS="-Xmx8G"
 python3 run.py data -s 100
 
+# or
 # only generate, do not split the data
 python3 run.py data -og
-
 # split data, no need generate again.
 python3 run.py data -os
 ```
