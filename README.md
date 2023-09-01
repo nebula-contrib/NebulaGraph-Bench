@@ -14,6 +14,8 @@ The main features:
 
 ## Dependency
 
+> ⚠️ Please note, the [NebulaGraph Importer](https://github.com/vesoft-inc/nebula-importer) being used by NebulaGraph Bench is [v3.x](https://github.com/vesoft-inc/nebula-importer/releases/tag/v3.4.0), the lastest branch of Importer [v4.x](https://github.com/vesoft-inc/nebula-importer/releases/tag/v4.0.0) is not yet supported.
+
 |   NebulaGraph Bench    |     NebuaGraph     | NebulaGraph Importer |   K6 Plugin  |   ldbc_snb_datagen  |   NebulaGraph go    |
 |:-----------------:|:-------------:|:---------------:|:------------:|:-------------------:|:--------------:|
 |       [v0.2](https://github.com/vesoft-inc/nebula-bench/releases/tag/v0.2)        |    [v2.0.1](https://github.com/vesoft-inc/nebula-graph/releases/tag/v2.0.1)     |     [v2.0.0-ga](https://github.com/vesoft-inc/nebula-importer/releases/tag/v2.0.0-ga)   |    [v0.0.6](https://github.com/vesoft-inc/k6-plugin/releases/tag/v0.0.6)    |       [v0.3.3](https://github.com/ldbc/ldbc_snb_datagen_spark/tree/v0.3.3)        |     [v2.0.0-ga](https://github.com/vesoft-inc/nebula-go/releases/tag/v2.0.0-ga)  |
