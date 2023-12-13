@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+
 class ScenarioMeta(type):
     def __new__(cls, name, bases, attrs, *args, **kwargs):
         # super(ScenarioMeta, cls).__new__(cls, name, bases, attrs, *args, **kwargs)
@@ -14,7 +15,7 @@ class ScenarioMeta(type):
 class BaseScenario(metaclass=ScenarioMeta):
     abstract = True
     is_insert_scenario = False
-    nGQL: str =""
+    nGQL: str = ""
     value: str = ""
     stage: dict
     csv_path: str

@@ -202,11 +202,7 @@ class K6Stress(Stress):
         Path(self.output_folder).mkdir(exist_ok=True, parents=True)
         if "--summary-trend-stats" not in params:
             params["--summary-trend-stats"] = ["min,avg,med,max,p(90),p(95),p(99)"]
-        if (
-            setting.INFLUXDB_URL is not None
-            and "--out" not in params
-            and "-o" not in params
-        ):
+        if setting.INFLUXDB_URL is not None and "--out" not in params and "-o" not in params:
             params["--out"] = ["influxdb={}".format(setting.INFLUXDB_URL)]
 
         for scenario in self.scenarios:
@@ -250,9 +246,7 @@ class K6Stress(Stress):
                         command.append(v)
 
             click.echo("run command as below:")
-            click.echo(
-                " ".join([x if "(" not in x else '"{}"'.format(x) for x in command])
-            )
+            click.echo(" ".join([x if "(" not in x else '"{}"'.format(x) for x in command]))
             if self.dry_run is not None and self.dry_run:
                 continue
             run_process(command)

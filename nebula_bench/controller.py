@@ -11,7 +11,12 @@ from nebula_bench import utils
 
 class BaseController(object):
     def __init__(
-        self, data_folder=None, space=None, user=None, password=None, address=None
+        self,
+        data_folder=None,
+        space=None,
+        user=None,
+        password=None,
+        address=None,
     ):
         self.workspace_path = setting.WORKSPACE_PATH
         self.data_folder = data_folder or setting.DATA_FOLDER
@@ -52,7 +57,7 @@ class NebulaController(BaseController):
 
     def dump_nebula_importer(self):
         kwargs = {}
-        if self.enable_prefix and self.vid_type == 'int':
+        if self.enable_prefix and self.vid_type == "int":
             raise Exception("must use prefix with vid type string")
         else:
             kwargs["enable_prefix"] = self.enable_prefix
@@ -73,10 +78,19 @@ class DumpController(object):
     def __init__(self):
         pass
 
-    def export(self, folder, output):
-        utils.jinja_dump(
-            "report.html.j2", output, {"data": self.get_data(folder)}
-        )
+    def export(self, folder, output, filetype):
+        if filetype == "html":
+            self._export_html(folder, output)
+        elif filetype == "csv":
+            self._export_csv(folder, output)
+        else:
+            raise Exception("not support filetype: %s" % filetype)
+
+    def _export_html(self, folder, output):
+        utils.jinja_dump("report.html.j2", output, {"data": self.get_data(folder)})
+
+    def _export_csv(self, folder, output):
+        utils.csv_dump(output, self.get_data(folder))
 
     def get_data(self, folder):
         # [
@@ -95,9 +109,7 @@ class DumpController(object):
         if folder is None:
             return
         package_name = "nebula_bench.scenarios"
-        scenarios = utils.load_class(
-            package_name, load_all=True, base_class=BaseScenario
-        )
+        scenarios = utils.load_class(package_name, load_all=True, base_class=BaseScenario)
 
         paths = sorted(Path(folder).iterdir(), key=os.path.getmtime)
         case = None
@@ -138,9 +150,7 @@ class DumpController(object):
     def serve(self, port=5000):
         import flask
 
-        app = flask.Flask(
-            __name__, template_folder=setting.WORKSPACE_PATH / "templates"
-        )
+        app = flask.Flask(__name__, template_folder=setting.WORKSPACE_PATH / "templates")
 
         @app.route("/", methods=["GET"])
         def index():

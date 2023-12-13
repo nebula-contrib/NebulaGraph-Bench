@@ -8,4 +8,4 @@ class BaseMatchScenario(BaseScenario):
 
 
 class Match1Hop(BaseMatchScenario):
-    nGQL = 'MATCH (v1:Person)-[e:KNOWS]->(v2:Person) WHERE id(v1) == {0} RETURN v2'
+    nGQL = "MATCH (v1:Person)-[e:KNOWS]->(v2:Person) WHERE id(v1) == {0} RETURN v2"
