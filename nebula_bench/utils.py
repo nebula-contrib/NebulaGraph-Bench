@@ -111,6 +111,7 @@ def csv_dump(output, data):
     header = [
         "Name",
         "Vu",
+        "Accuracy(%)",
         "QPS",
         "LatencyP90(ms)",
         "LatencyP95(ms)",
@@ -118,6 +119,9 @@ def csv_dump(output, data):
         "ResponseTimeP90(ms)",
         "ResponseTimeP95(ms)",
         "ResponseTimeP99(ms)",
+        "RowSizeP90",
+        "RowSizeP95",
+        "RowSizeP99",
     ]
     df = pd.DataFrame(columns=header)
     for d in data:
@@ -125,6 +129,9 @@ def csv_dump(output, data):
             row = pd.Series(dtype="float64")
             row["Name"] = d["case"]["name"]
             row["Vu"] = k6["vu"]
+            total_checks = k6["report"]["metrics"]["checks"]["passes"] + k6["report"]["metrics"]["checks"]["fails"]
+            passed_checks = k6["report"]["metrics"]["checks"]["passes"]
+            row["Accuracy(%)"] = round(passed_checks/total_checks*100, 2)
             row["QPS"] = round(k6["report"]["metrics"]["iterations"]["rate"], 2)
             row["LatencyP90(ms)"] = round(k6["report"]["metrics"]["latency"]["p(90)"] / 1e3, 2)
             row["LatencyP95(ms)"] = round(k6["report"]["metrics"]["latency"]["p(95)"] / 1e3, 2)
@@ -138,6 +145,9 @@ def csv_dump(output, data):
             row["ResponseTimeP99(ms)"] = round(
                 k6["report"]["metrics"]["responseTime"]["p(99)"] / 1e3, 2
             )
+            row["RowSizeP90"] = k6["report"]["metrics"]["rowSize"]["p(90)"]
+            row["RowSizeP95"] = k6["report"]["metrics"]["rowSize"]["p(95)"]
+            row["RowSizeP99"] = k6["report"]["metrics"]["rowSize"]["p(99)"]
             df = pd.concat([df, row.to_frame().T], ignore_index=True)
 
     df = df.sort_values(by=["Name", "Vu"])
