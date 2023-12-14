@@ -14,16 +14,13 @@ SH_COMMAND = "/bin/bash"
 
 def common(f):
     f = click.option(
-        "-f", "--folder", help="ldbc data folder, default: target/data/test_data"
+        "-f",
+        "--folder",
+        help="ldbc data folder, default: target/data/test_data",
     )(f)
-
-    f = click.option(
-        "-a", "--address", help="Nebula Graph address, default: 127.0.0.1:9669"
-    )(f)
+    f = click.option("-a", "--address", help="Nebula Graph address, default: 127.0.0.1:9669")(f)
     f = click.option("-u", "--user", help="Nebula Graph address, default: root")(f)
-    f = click.option("-p", "--password", help="Nebula Graph address, default: nebula")(
-        f
-    )
+    f = click.option("-p", "--password", help="Nebula Graph address, default: nebula")(f)
     f = click.option(
         "-s",
         "--space",
@@ -40,10 +37,17 @@ def cli():
 
 @cli.command(help="generate and split ldbc data")
 @click.option(
-    "-s", "--scale-factor", default="1", help="scale factor for ldbc, default: 1"
+    "-s",
+    "--scale-factor",
+    default="1",
+    help="scale factor for ldbc, default: 1",
 )
 @click.option(
-    "-og", "--only-generate", default=False, is_flag=True, help="only generate data"
+    "-og",
+    "--only-generate",
+    default=False,
+    is_flag=True,
+    help="only generate data",
 )
 @click.option(
     "-os",
@@ -55,17 +59,26 @@ def cli():
 def data(scale_factor, only_generate, only_split):
     my_env = {"scaleFactor": str(scale_factor)}
     if only_generate:
-        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
+        command = [
+            SH_COMMAND,
+            setting.WORKSPACE_PATH / "scripts/generate-data.sh",
+        ]
         c = run_process(command, my_env)
 
     elif only_split:
         command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/split-data.sh"]
         c = run_process(command)
     else:
-        command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/generate-data.sh"]
+        command = [
+            SH_COMMAND,
+            setting.WORKSPACE_PATH / "scripts/generate-data.sh",
+        ]
         c = run_process(command, my_env)
         if c == 0:
-            command = [SH_COMMAND, setting.WORKSPACE_PATH / "scripts/split-data.sh"]
+            command = [
+                SH_COMMAND,
+                setting.WORKSPACE_PATH / "scripts/split-data.sh",
+            ]
             b = run_process(command)
 
     exit(c)
@@ -80,14 +93,10 @@ def nebula():
 @click.option("-a", "--address", help="Nebula Graph address, default: 127.0.0.1:9669")
 @click.option("-u", "--user", help="Nebula Graph address, default: root")
 @click.option("-p", "--password", help="Nebula Graph address, default: nebula")
-@click.option(
-    "-k", "--keep", help="keep spaces that not be dropped, e.g. space1,space2"
-)
+@click.option("-k", "--keep", help="keep spaces that not be dropped, e.g. space1,space2")
 def clean(address, user, password, keep):
     sc = NebulaController(user=user, password=password, address=address)
-    value = click.confirm(
-        "Will delete all spaces in Nebula Graph. Continue?", abort=True
-    )
+    value = click.confirm("Will delete all spaces in Nebula Graph. Continue?", abort=True)
     sc.clean_spaces(keep)
 
 
@@ -114,10 +123,11 @@ def clean(address, user, password, keep):
     help="enable add prefix in vid, vid type should be string",
 )
 def importer(folder, address, user, password, space, vid_type, enable_prefix, dry_run):
-    assert vid_type in ["int", "string"], 'the vid type should be "ini" or "string" '
-    nc = NebulaController(
-        folder, space, user, password, address, vid_type, enable_prefix
-    )
+    assert vid_type in [
+        "int",
+        "string",
+    ], 'the vid type should be "ini" or "string" '
+    nc = NebulaController(folder, space, user, password, address, vid_type, enable_prefix)
     c = nc.import_space(dry_run)
     if c != 0:
         exit(c)
@@ -188,7 +198,7 @@ def report():
     pass
 
 
-@report.command(help="dump the html report")
+@report.command(help="dump the report")
 @click.option(
     "-f",
     "--folder",
@@ -199,12 +209,18 @@ def report():
     "--output",
     help="dump the html to file, default: report.html",
 )
-def export(folder, output):
+@click.option(
+    "-t",
+    "--filetype",
+    default="html",
+    help="dump the report type, values should be [html, csv], default: html",
+)
+def export(folder, output, filetype):
     controller = DumpController()
     if folder is None:
         folder = controller.get_latest_output()
 
-    controller.export(folder=folder,output=output)
+    controller.export(folder=folder, output=output, filetype=filetype)
 
 
 @report.command(help="launch the http report server")

@@ -1,4 +1,4 @@
 
 
 format:
-	black -l 100 .
+	black -l 100 nebula_bench

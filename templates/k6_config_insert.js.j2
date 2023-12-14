@@ -3,15 +3,27 @@ import { check } from 'k6';
 import { Trend } from 'k6/metrics';
 import { sleep } from 'k6';
 
-var lantencyTrend = new Trend('latency');
-var responseTrend = new Trend('responseTime');
+var latencyTrend = new Trend('latency', true);
+var responseTrend = new Trend('responseTime', true);
 var rowSizeTrend = new Trend('rowSize');
-// initial nebula connect pool
-var pool = nebulaPool.initWithSize("{{ address }}", 2000, 200*{{ vu }});
 
+var graph_option = {
+  address: "{{ address }}",
+  space: "{{ space }}",
+  pool_policy: "session",
+  csv_path: "{{ csv_path }}",
+  csv_delimiter: "|",
+  csv_with_header: true,
+  output: "{{ output_path }}",
+  username: "{{ user }}",
+  password: "{{ password }}",
+  max_size: 2000,
+};
+
+nebulaPool.setOption(graph_option);
+var pool = nebulaPool.init();
 // initial session for every vu
-var session = pool.getSession("{{ user }}", "{{ password }}");
-session.execute("USE {{ space }}");
+var session = pool.getSession()
 
 String.prototype.format = function () {
   var formatted = this;
@@ -22,14 +34,6 @@ String.prototype.format = function () {
   });
   return formatted;
 };
-
-export function setup() {
-  // config csv file
-  pool.configCSV("{{ csv_path }}", "|", false);
-  // config output file, save every query information
-  pool.configOutput("{{ output_path }}");
-  sleep(1)
-}
 
 export default function (data) {
   let ngql = '{{ nGQL }}';
@@ -45,12 +49,14 @@ export default function (data) {
   ngql = ngql + " " + batches.join(',');
   let response = session.execute(ngql);
   check(response, {
-    "IsSucceed": (r) => r.isSucceed() === true
+    "IsSucceed": (r) => r !== null && r.isSucceed() === true
   });
   // add trend
-  lantencyTrend.add(response.getLatency());
-  responseTrend.add(response.getResponseTime());
-  rowSizeTrend.add(response.getRowSize());
+  if (response !== null) {
+    latencyTrend.add(response.getLatency());
+    responseTrend.add(response.getResponseTime());
+    rowSizeTrend.add(response.getRowSize());
+  }
 };
 
 export function teardown() {

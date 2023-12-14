@@ -9,8 +9,13 @@ import datetime
 
 import jinja2
 import click
+import pandas as pd
 
-from nebula_bench.setting import WORKSPACE_PATH, DINGDING_SECRET, DINGDING_WEBHOOK
+from nebula_bench.setting import (
+    WORKSPACE_PATH,
+    DINGDING_SECRET,
+    DINGDING_WEBHOOK,
+)
 
 
 def load_class(package_name, load_all, base_class, class_name=None):
@@ -27,10 +32,7 @@ def load_class(package_name, load_all, base_class, class_name=None):
                 _class = getattr(_module, name)
                 if not inspect.isclass(_class):
                     continue
-                if (
-                    issubclass(_class, base_class)
-                    and _class.__name__ != base_class.__name__
-                ):
+                if issubclass(_class, base_class) and _class.__name__ != base_class.__name__:
                     r.append(_class)
     else:
         assert class_name is not None, "class_name should not be None"
@@ -103,3 +105,50 @@ def run_process(command, env=None):
 
 def get_now_str():
     return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
+
+def csv_dump(output, data):
+    header = [
+        "Name",
+        "Vu",
+        "Accuracy(%)",
+        "QPS",
+        "LatencyP90(ms)",
+        "LatencyP95(ms)",
+        "LatencyP99(ms)",
+        "ResponseTimeP90(ms)",
+        "ResponseTimeP95(ms)",
+        "ResponseTimeP99(ms)",
+        "RowSizeP90",
+        "RowSizeP95",
+        "RowSizeP99",
+    ]
+    df = pd.DataFrame(columns=header)
+    for d in data:
+        for k6 in d["k6"]:
+            row = pd.Series(dtype="float64")
+            row["Name"] = d["case"]["name"]
+            row["Vu"] = k6["vu"]
+            total_checks = k6["report"]["metrics"]["checks"]["passes"] + k6["report"]["metrics"]["checks"]["fails"]
+            passed_checks = k6["report"]["metrics"]["checks"]["passes"]
+            row["Accuracy(%)"] = round(passed_checks/total_checks*100, 2)
+            row["QPS"] = round(k6["report"]["metrics"]["iterations"]["rate"], 2)
+            row["LatencyP90(ms)"] = round(k6["report"]["metrics"]["latency"]["p(90)"] / 1e3, 2)
+            row["LatencyP95(ms)"] = round(k6["report"]["metrics"]["latency"]["p(95)"] / 1e3, 2)
+            row["LatencyP99(ms)"] = round(k6["report"]["metrics"]["latency"]["p(99)"] / 1e2, 2)
+            row["ResponseTimeP90(ms)"] = round(
+                k6["report"]["metrics"]["responseTime"]["p(90)"] / 1e3, 2
+            )
+            row["ResponseTimeP95(ms)"] = round(
+                k6["report"]["metrics"]["responseTime"]["p(95)"] / 1e3, 2
+            )
+            row["ResponseTimeP99(ms)"] = round(
+                k6["report"]["metrics"]["responseTime"]["p(99)"] / 1e3, 2
+            )
+            row["RowSizeP90"] = k6["report"]["metrics"]["rowSize"]["p(90)"]
+            row["RowSizeP95"] = k6["report"]["metrics"]["rowSize"]["p(95)"]
+            row["RowSizeP99"] = k6["report"]["metrics"]["rowSize"]["p(99)"]
+            df = pd.concat([df, row.to_frame().T], ignore_index=True)
+
+    df = df.sort_values(by=["Name", "Vu"])
+    df.to_csv(output, index=False)
