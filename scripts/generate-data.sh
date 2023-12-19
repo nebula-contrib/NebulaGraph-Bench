@@ -45,7 +45,7 @@ else
   rm -rf ldbc_snb_datagen && \
   wget https://github.com/ldbc/ldbc_snb_datagen_hadoop/archive/refs/tags/v${LDBC_SNB_DATAGEN_VERSION}.tar.gz && \
   tar -zxvf v${LDBC_SNB_DATAGEN_VERSION}.tar.gz  && \
-  mv v${LDBC_SNB_DATAGEN_VERSION}.tar.gz ldbc_snb_datagen  && \
+  mv ldbc_snb_datagen_hadoop-${LDBC_SNB_DATAGEN_VERSION} ldbc_snb_datagen  && \
   cd ldbc_snb_datagen  && \
   cp test_params.ini params.ini
 fi
