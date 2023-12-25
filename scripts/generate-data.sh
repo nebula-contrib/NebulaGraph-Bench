@@ -43,7 +43,9 @@ if [ -d ${DATA_DIR}/ldbc_snb_datagen ];then
 else
   cd ${DATA_DIR}  && \
   rm -rf ldbc_snb_datagen && \
-  git clone --branch ${LDBC_SNB_DATAGEN_VERSION} https://github.com/ldbc/ldbc_snb_datagen && \
+  wget https://github.com/ldbc/ldbc_snb_datagen_hadoop/archive/refs/tags/v${LDBC_SNB_DATAGEN_VERSION}.tar.gz && \
+  tar -zxvf v${LDBC_SNB_DATAGEN_VERSION}.tar.gz  && \
+  mv ldbc_snb_datagen_hadoop-${LDBC_SNB_DATAGEN_VERSION} ldbc_snb_datagen  && \
   cd ldbc_snb_datagen  && \
   cp test_params.ini params.ini
 fi
