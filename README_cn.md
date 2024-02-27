@@ -67,7 +67,7 @@ python3 run.py --help
 安装 golang，然后编译相关工具。
 
 * [nebula-importer](https://github.com/vesoft-inc/nebula-importer)
-* [xk6-nebula](https://github.com/HarrisChu/xk6-nebula)
+* [k6-plugin](https://github.com/vesoft-inc/k6-plugin)
 
 ```bash
 /bin/bash scripts/setup.sh
@@ -132,7 +132,7 @@ python3 run.py nebula importer --dry-run
 
 ### nebula benchmark
 
-使用带有 [xk6-nebula](https://github.com/HarrisChu/xk6-nebula) 插件的 [K6](https://github.com/k6io/k6) 来进行压测。
+使用带有 [k6-plugin](https://github.com/vesoft-inc/k6-plugin) 插件的 [K6](https://github.com/k6io/k6) 来进行压测。
 
 自动化的场景，在 `nebula_bench/scenarios/` 中。
 
