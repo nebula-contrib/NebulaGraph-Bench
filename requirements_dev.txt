@@ -1,4 +1,4 @@
 pytest
-black == 21.5b
+black == 24.3.0
 wheel
 pyinstaller
