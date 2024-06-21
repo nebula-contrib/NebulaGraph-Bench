@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>NebulaGraph Benchmark Chart</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body style="height: auto">
+	<div class="container-fluid">
+		<div id="title" class="h3">NebulaGraph Benchmark Chart</div>
+		{% if server %}
+		<div class="col-sm-2">
+			<div><span>select src output</span></div>
+			<div style="margin-top: 5px;">
+					<select id="src_output" onchange="changeOutput()" style="width: auto;">
+					{% for output in outputs %}
+						{% if output == src_output%}
+							<option value="{{ output }}" selected>{{ output }}</option>
+						{% else %}
+							<option value="{{ output }}">{{ output }}</option>
+						{% endif %}
+					{% endfor %}
+					</select>
+			</div>
+		</div>
+		<div class="col-sm-2">
+			<div><span>select dst output</span></div>
+			<div style="margin-top: 5px;">
+					<select id="dst_output" onchange="changeOutput()" style="width: auto;">
+					{% for output in outputs %}
+						{% if output == dst_output%}
+							<option value="{{ output }}" selected>{{ output }}</option>
+						{% else %}
+							<option value="{{ output }}">{{ output }}</option>
+						{% endif %}
+					{% endfor %}
+					</select>
+			</div>
+		</div>
+		{% endif %}
+		
+		<div id="report" style="margin-top: 15px;font-size: 90%;"> </div>
+
+	<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+	<script type="text/javascript">
+		function draw_time_chart(container, title, vus, p90, p95, p99, showLabel) {
+			let option = {
+				title: {
+					text: title,
+					x: 'center',
+					textStyle: {
+						fontSize: 15,
+						fontWeight: 'normal'
+					}
+				},
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: ['p90', 'p95', 'p99'],
+					top: '8%'
+				},
+				grid: {
+					left: '3%',
+					right: '4%',
+					bottom: '3%',
+					containLabel: true
+				},
+				toolbox: {
+					feature: {
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: true,
+					data: vus
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [
+					{
+						name: 'p90',
+						type: 'line',
+						// stack: '总量',
+						data: p90,
+						label: {
+							show: showLabel,
+							position: 'right'
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					},
+					{
+						name: 'p95',
+						type: 'line',
+						// stack: '总量',
+						data: p95,
+						label: {
+							show: showLabel,
+							position: 'left'
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					},
+					{
+						name: 'p99',
+						type: 'line',
+						// stack: '总量',
+						data: p99,
+						label: {
+							show: showLabel,
+							position: 'top'
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					}
+				]
+			};
+
+			let myChart = echarts.init(document.getElementById(container));
+			myChart.setOption(option);
+		}
+
+		function drawComparisonChart(containerId, title, vus, seriesA, seriesB, showLabel) {
+			const option = {
+				title: {
+					text: title,
+					x: 'center',
+					textStyle: {
+						fontSize: 15,
+						fontWeight: 'normal'
+					}
+				},
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: ['Current', 'Baseline'],
+					top: '8%'
+				},
+				grid: {
+					left: '3%',
+					right: '4%',
+					bottom: '3%',
+					containLabel: true
+				},
+				toolbox: {
+					feature: {
+						saveAsImage: {}
+					}
+				},
+				xAxis: {
+					type: 'category',
+					boundaryGap: true,
+					data: vus
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [
+					{
+						name: 'Current',
+						type: 'line',
+						color: 'orange',
+						data: seriesA,
+						label: {
+							show: showLabel,
+							position: [10, 10]
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					},
+					{
+						name: 'Baseline',
+						type: 'line',
+						color: '#3977b0',
+						data: seriesB,
+						label: {
+							show: showLabel,
+							position: [-10, -10]
+						},
+						labelLayout: {
+							moveOverlap: 'shiftY'
+						}
+					}
+				]
+			}
+			const c = document.getElementById(containerId)
+			if (c == null) {
+				return
+			}
+		
+			echarts.dispose(c)
+			const myChart = echarts.init(c)
+			myChart.setOption(option)
+		}
+		
+
+		function get_echart_data(reports, type, metric) {
+			let data = [];
+
+			for (let i = 0; i < reports.length; i++) {
+				let metrics = reports[i]["report"]["metrics"]
+				if (metrics[type] == undefined) {
+					return data
+				}
+				if (metrics[type][metric] == undefined) {
+					return data
+				}
+
+				let d = metrics[type][metric];
+				if (type == "latency" || type == "responseTime") {
+					d = d / 1000
+				}
+				if (typeof d === 'number') {
+					if (parseInt(d, 10) === d) {
+						data.push(d);
+					} else {
+						data.push(d.toFixed(2));
+					}
+				} else {
+					data.push(d);
+				}
+			}
+			return data
+		}
+
+		function draw_one(drawDiv, name, src_metrcis, dst_metrcis) {
+			// QPS and Accuracy
+			let iterDiv = document.createElement('div');
+			iterDiv.classList.add("col-sm-3");
+			let iterDraw = document.createElement('div');
+			iterDraw.id = name + "_iter";
+			iterDraw.style = "height: 300px; width: 100%;"
+			iterDiv.appendChild(iterDraw)
+			drawDiv.appendChild(iterDiv);
+			let vus = [];
+			for (let j = 0; j < src_metrcis.length; j++) {
+				vus.push(src_metrcis[j].vu+"_vu");
+			}
+	
+			drawComparisonChart(
+				iterDraw.id,
+				name + " QPS and Accuracy",
+				vus,
+				get_echart_data(src_metrcis, "iterations", "rate"),
+				get_echart_data(dst_metrcis, "iterations", "rate"),
+				true,
+			)
+			//latency, response time, row size
+			const metrics = ["latency", "responseTime", "rowSize"]
+			for (let m of metrics) {
+				let metricDiv = document.createElement('div');
+				let metricDraw = document.createElement('div');
+				metricDiv.classList.add("col-sm-3");
+				metricDraw.id = name + "_" + m;
+				metricDraw.style = "height: 300px; width: 100%;";
+				metricDiv.appendChild(metricDraw);
+				drawDiv.appendChild(metricDiv);
+				let title = m
+				if (m === "rowSize") {
+					title = title[0].toUpperCase() + title.slice(1)
+				} else {
+					title = title[0].toUpperCase() + title.slice(1) + " (ms)"
+				}
+				drawComparisonChart(
+					metricDraw.id,
+					name + " " + title,
+					vus,
+					get_echart_data(src_metrcis, m, "p(95)"),
+					get_echart_data(dst_metrcis, m, "p(95)"),
+					true,
+				);
+			}
+		}
+
+		function compare_all(src, dst) {
+			for (let i=0, j=0; i < src.length && j < dst.length; i++, j++) {
+				const fromCase = src[i].case
+        const toCase = dst[j].case
+        if (fromCase.name === toCase.name) {
+					let infoDiv = document.createElement('div');
+					infoDiv.classList.add("row");
+					infoDiv.style = "margin-top: 15px;"
+					let name = document.createElement('div');
+					name.innerHTML = fromCase.name;
+					infoDiv.appendChild(name);
+					let stmt = document.createElement('div');
+					stmt.style = "color: gray;font-size: 80%;"
+					stmt.innerHTML = fromCase.stmt;
+					infoDiv.appendChild(stmt);
+					let report = document.getElementById('report');
+					report.appendChild(infoDiv);
+					let drawDiv = document.createElement('div');
+					drawDiv.classList.add("row");
+					drawDiv.style = "margin-top: 8px;";
+					report.appendChild(drawDiv);
+
+					const from_k6Metrics = src[i].k6
+					const to_k6Metrics = dst[j].k6
+					draw_one(drawDiv, fromCase.name, from_k6Metrics, to_k6Metrics)
+          i++
+          j++
+        } else if (fromCase.name < toCase.name) {
+          i++
+        } else {
+          j++
+				}
+			}
+		};
+
+		let src_data = {{ src_data }};
+		let dst_data = {{ dst_data }};
+			
+		compare_all(src_data, dst_data);
+
+		{% if server %}
+		function changeOutput() {
+			var src = document.getElementById("src_output").value;
+			var dst = document.getElementById("dst_output").value;
+			window.location.href = "/comparison?src=" + src + "&dst=" + dst;
+		}
+		{% endif %}
+
+	</script>
+</body>
+
+</html>
