@@ -171,7 +171,34 @@ class DumpController(object):
                 outputs=outputs_name,
                 current_output=current_output_name,
             )
-
+        @app.route("/comparison", methods=["GET"])
+        def comparison():
+            src = flask.request.args.get("src", "")
+            dst = flask.request.args.get("dst", "")
+            if src == "" :
+                src = self.get_latest_output()
+            if dst == "":
+                dst = self.get_latest_output()
+            if src == "" or dst == "":
+                return "No src or dst output"
+            src_data = self.get_data(
+                (setting.WORKSPACE_PATH / "output" / src).absolute()
+            )
+            dst_data = self.get_data(
+                (setting.WORKSPACE_PATH / "output" / dst).absolute()
+            )
+            outputs_name = [Path(output).name for output in self.get_all_output()]
+            
+            return flask.render_template(
+                "comparison.html.j2",
+                src_data=src_data,
+                dst_data=dst_data,
+                outputs=outputs_name,
+                server=True,
+                src_output=src,
+                dst_output=dst,
+            )
+          
         app.run(host="0.0.0.0", port=port)
 
     def get_all_output(self):
